@@ -373,6 +373,34 @@ the Biling Media channel's **Live → Past live streams** section. It does not i
 Videos tab. New livestreams can be added through Prisma Studio until a secure publishing workflow
 or official YouTube synchronization is implemented.
 
+### Deploy a client-demo environment
+
+The web app is hosted on Vercel; the NestJS API and PostgreSQL are hosted on Railway. The API's
+Railway Dockerfile is in `apps/api/`, with Railway configuration in the repository-root
+`railway.json`. Do not deploy until the current
+changes are committed and pushed to the GitHub branch you intend to use.
+
+1. In Railway, create a project and add a PostgreSQL service. Add an API service from this GitHub
+   repository and leave its root directory at the repository root so Railway uses `railway.json`.
+2. In the API service's Variables, set `DATABASE_URL` to the PostgreSQL service's
+   `${{Postgres.DATABASE_URL}}` reference (use the actual database service name if it differs),
+   `CORS_ORIGIN` to the exact Vercel site origin, and `NODE_ENV` to `production`. Railway supplies
+   `PORT`. Generate an API public domain; the API health check and Prisma migrations are configured
+   in `railway.json`.
+3. After the API deploys successfully, run the one-time seed command from the API service's Railway
+   shell: `pnpm --filter @biling/api db:seed`. This imports the current seven Infilet past streams.
+4. In Vercel, import the same repository and set its Root Directory to `apps/web`. Set the Install
+   Command to `cd ../.. && pnpm install --frozen-lockfile` and the Build Command to
+   `cd ../.. && pnpm exec turbo run build --filter=@biling/web`. Configure `API_BASE_URL` as the
+   API's public URL followed by `/api/v1` (for example, `https://api.example.com/api/v1`). Add the
+   final Vercel production domain to the API's `CORS_ORIGIN`, then redeploy the API and web app.
+5. Verify `/api/v1/health`, `/api/v1/shows`, and `/api/v1/episodes` on the public API, and confirm
+   the Vercel homepage displays Infilet and opens the linked YouTube streams.
+
+Keep Railway usage within the trial credit for a demo; do not enable paid billing without explicit
+approval. The demo has no custom domain requirement, YouTube live-status integration, or public
+content editor.
+
 ### Quality checks
 
 ```powershell
