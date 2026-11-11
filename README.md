@@ -96,26 +96,26 @@ Applications share a repository but retain independent build, deployment, config
 
 ## Technology Stack
 
-| Layer | Technology |
-|---|---|
-| Web frontend | Next.js |
-| Frontend language | TypeScript |
-| Backend | NestJS |
-| Backend language | TypeScript |
-| API | REST |
-| API documentation | OpenAPI / Swagger |
-| Database | PostgreSQL |
-| ORM | Prisma |
-| Validation | Zod |
-| Package manager | pnpm |
-| Monorepo orchestration | Turborepo |
-| Containerization | Docker |
-| Infrastructure as Code | Terraform |
-| CI/CD | GitHub Actions |
-| Testing | Jest / Playwright |
-| Background processing | BullMQ |
-| Cache / job infrastructure | Redis |
-| Media delivery | Object storage + CDN |
+| Layer                      | Technology           |
+| -------------------------- | -------------------- |
+| Web frontend               | Next.js              |
+| Frontend language          | TypeScript           |
+| Backend                    | NestJS               |
+| Backend language           | TypeScript           |
+| API                        | REST                 |
+| API documentation          | OpenAPI / Swagger    |
+| Database                   | PostgreSQL           |
+| ORM                        | Prisma               |
+| Validation                 | Zod                  |
+| Package manager            | pnpm                 |
+| Monorepo orchestration     | Turborepo            |
+| Containerization           | Docker               |
+| Infrastructure as Code     | Terraform            |
+| CI/CD                      | GitHub Actions       |
+| Testing                    | Jest / Playwright    |
+| Background processing      | BullMQ               |
+| Cache / job infrastructure | Redis                |
+| Media delivery             | Object storage + CDN |
 
 ## Backend Architecture
 
@@ -166,16 +166,16 @@ Video delivery is intended to rely on dedicated streaming platforms or media inf
 
 ## Initial Hosting Strategy
 
-| Component | Initial Provider / Technology |
-|---|---|
-| Web frontend | Vercel |
-| Backend API | Railway |
-| Background workers | Railway |
-| Database | Managed PostgreSQL |
-| Cache / queues | Redis |
-| Media storage | Object storage |
-| Media delivery | CDN |
-| CI/CD | GitHub Actions |
+| Component          | Initial Provider / Technology |
+| ------------------ | ----------------------------- |
+| Web frontend       | Vercel                        |
+| Backend API        | Railway                       |
+| Background workers | Railway                       |
+| Database           | Managed PostgreSQL            |
+| Cache / queues     | Redis                         |
+| Media storage      | Object storage                |
+| Media delivery     | CDN                           |
+| CI/CD              | GitHub Actions                |
 
 Hosting providers are implementation choices rather than permanent architectural dependencies.
 
@@ -318,6 +318,89 @@ The platform will be developed incrementally.
 This repository represents the evolving implementation of the Biling Media platform.
 
 Architectural decisions and implementation details will be documented progressively.
+
+---
+
+## Local Development
+
+### Requirements
+
+- Node.js 22.11 or newer (Node.js 24 is the CI runtime).
+- Docker Desktop with Docker Compose for local PostgreSQL.
+- pnpm 10.34.9. On Windows, use `npx pnpm@10` if a global pnpm command is unavailable.
+
+### Start the project
+
+From the repository root in PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+npx pnpm@10 install
+npx pnpm@10 run db:up
+npx pnpm@10 run db:generate
+npx pnpm@10 run db:migrate
+npx pnpm@10 run db:seed
+npx pnpm@10 run dev
+```
+
+The web app is available at `http://localhost:3000`. The API listens at `http://localhost:3001`, with
+health at `/api/v1/health` and OpenAPI documentation at `/api/v1/docs`. The API validates required
+environment configuration on startup and connects to PostgreSQL before serving requests.
+
+The local Compose database uses development-only defaults. Change the values in `.env` before
+exposing the database outside your machine. PostgreSQL data is kept in a named Docker volume.
+
+### Publishing shows and YouTube episodes
+
+The homepage reads published content from PostgreSQL through the public API:
+
+- `GET /api/v1/shows` lists published shows and their latest published episode.
+- `GET /api/v1/episodes` lists the latest 12 published episodes.
+
+To add local development content, start the database and API, then run `npx pnpm@10 run db:studio`
+from the repository root. In Prisma Studio, create a **Show** with a unique slug and set its status
+to `PUBLISHED`. Create an **Episode** related to that show; set its status to `PUBLISHED` and
+`publishedAt` to a date/time. To link YouTube, enter only the 11-character video ID in
+`youtubeVideoId` (the value after `v=` in a standard YouTube watch URL). The homepage fetches the
+published records on each request; linked episodes show their YouTube thumbnail and open the
+YouTube watch page. Episodes without a video ID remain listed with a clear placeholder.
+
+This is a manual publishing workflow for the MVP; there is no YouTube channel synchronization or
+public write/admin API. Never expose Prisma Studio publicly.
+
+The repeatable `npx pnpm@10 run db:seed` command imports the seven current **Infilet** archives from
+the Biling Media channel's **Live → Past live streams** section. It does not import uploads from the
+Videos tab. New livestreams can be added through Prisma Studio until a secure publishing workflow
+or official YouTube synchronization is implemented.
+
+### Quality checks
+
+```powershell
+npx pnpm@10 run lint
+npx pnpm@10 run typecheck
+npx pnpm@10 run test
+npx pnpm@10 run build
+```
+
+`db:up` and `db:down` manage only the local PostgreSQL service. Redis and background workers are
+intentionally not included until asynchronous jobs are needed.
+
+## Initial Implementation Notes
+
+- The web app is a responsive, server-rendered discovery homepage. It reads published shows and
+  episodes from the API; YouTube playback opens on YouTube. Show detail pages, native playback,
+  search, accounts, and community features remain future work.
+- The web visual system uses shared CSS tokens and RTL-aware layout rules. The supplied
+  `apps/web/public/logo.png` is used unchanged; production photography and approved portraits should
+  replace the clearly marked placeholders. See `apps/web/public/ASSET_GUIDE.md`.
+- The API is a modular NestJS application with a `/api/v1` prefix, health endpoint, Swagger
+  documentation, request validation, security headers, CORS configuration, and consistent error
+  responses.
+- Prisma starts with user identity, shows, and episodes. Episodes can reference a YouTube video ID;
+  user credentials and authentication are not modeled yet. The schema deliberately avoids premature
+  billing, engagement, and moderation models.
+- Prisma uses its PostgreSQL driver adapter, and migrations are managed with
+  `npx pnpm@10 run db:migrate`.
 
 ## License
 

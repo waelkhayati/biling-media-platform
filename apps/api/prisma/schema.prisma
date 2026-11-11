@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  displayName String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Show {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  description String?       @db.Text
+  posterUrl   String?
+  featured    Boolean       @default(false)
+  status      ContentStatus @default(DRAFT)
+  metadata    Json?
+  episodes    Episode[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model Episode {
+  id              String        @id @default(cuid())
+  showId          String
+  show            Show          @relation(fields: [showId], references: [id], onDelete: Cascade)
+  title           String
+  slug            String
+  description     String?       @db.Text
+  episodeNumber   Int?
+  durationSeconds Int?
+  youtubeVideoId  String?       @unique @db.VarChar(11)
+  status          ContentStatus @default(DRAFT)
+  publishedAt     DateTime?
+  metadata        Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([showId, slug])
+  @@index([showId, status, publishedAt])
+}

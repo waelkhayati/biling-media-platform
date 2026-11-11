@@ -1,0 +1,41 @@
+{
+  "name": "biling-media-platform",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=22.11.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose -f infrastructure/docker-compose.yml up -d",
+    "db:down": "docker compose -f infrastructure/docker-compose.yml down",
+    "db:generate": "turbo run db:generate --filter=@biling/api",
+    "db:migrate": "turbo run db:migrate --filter=@biling/api",
+    "db:studio": "turbo run db:studio --filter=@biling/api",
+    "db:seed": "turbo run db:seed --filter=@biling/api"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/engines",
+      "@swc/core",
+      "esbuild",
+      "prisma"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
+    "prettier": "^3.6.2",
+    "turbo": "^2.11.10",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4"
+  }
+}
