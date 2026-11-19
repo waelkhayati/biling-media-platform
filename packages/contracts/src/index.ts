@@ -1,4 +1,11 @@
-import type { CreateShowInput, PublishedEpisode, PublishedShow, ShowStatus } from "@biling/schemas";
+import type {
+  CreateShowInput,
+  PublishedEpisode,
+  PublishedEpisodeDetails,
+  PublishedShow,
+  PublishedShowDetails,
+  ShowStatus,
+} from "@biling/schemas";
 
 export interface ShowSummary extends CreateShowInput {
   id: string;
@@ -20,3 +27,22 @@ export interface EpisodeSummary {
 
 export type PublishedShowSummary = PublishedShow;
 export type PublishedEpisodeSummary = PublishedEpisode;
+export type PublishedShowDetail = PublishedShowDetails;
+export type PublishedEpisodeDetail = PublishedEpisodeDetails;
+export type * from "./admin.js";
+export type {
+  ArticleBlock,
+  ArticleInput,
+  ArticleUpdate,
+  ArticleSummary,
+  ArticleDetail,
+  ArticleList,
+  StudioArticle,
+  ArticleQuery,
+} from "@biling/schemas";
+
+export type {
+  ContentSearchQuery,
+  ContentSearchResults,
+  PublishedShowFilters,
+} from "@biling/schemas";

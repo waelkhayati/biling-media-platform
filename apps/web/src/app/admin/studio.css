@@ -1,0 +1,363 @@
+.studio {
+  min-height: 100vh;
+}
+
+.studio :is(h1, h2) {
+  font-family: var(--font-display);
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.studio h1 {
+  margin: 0;
+  font-size: clamp(2.25rem, 5vw, 4.5rem);
+}
+
+.studio h2 {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.studio a:focus-visible,
+.studio :is(input, textarea, select, button, [tabindex]):focus-visible {
+  outline: 3px solid var(--color-black);
+  outline-offset: 3px;
+}
+
+.studio-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding-block: 0.75rem;
+  border-bottom: 4px solid var(--color-black);
+  background: var(--color-orange);
+}
+
+.studio-header nav,
+.studio-actions,
+.studio-account {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.studio-brand,
+.studio-header nav a,
+.studio-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 0.65rem;
+  font-weight: 800;
+}
+
+.studio-header nav a:hover,
+.studio-table a:hover {
+  text-decoration: underline;
+}
+
+.studio-main {
+  padding-block: clamp(1.75rem, 5vw, 4rem);
+}
+
+.studio-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block-end: 1.5rem;
+}
+
+.studio-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  width: fit-content;
+  padding: 0.55rem 0.9rem;
+  border: 2px solid var(--color-black);
+  background: var(--color-black);
+  color: var(--color-paper);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.studio-button-outline {
+  background: var(--color-paper);
+  color: var(--color-black);
+}
+
+.studio-button:hover:not(:disabled) {
+  background: var(--color-lime);
+  color: var(--color-black);
+}
+
+.studio-button:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.studio-totals,
+.studio-fields,
+.studio-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
+}
+
+.studio-totals section {
+  padding: 0 1rem 1rem;
+  border: var(--border-thin);
+  border-top: 4px solid var(--color-orange);
+}
+
+.studio-totals dl {
+  display: flex;
+  gap: clamp(1rem, 7vw, 5rem);
+  margin: 0;
+}
+
+.studio-totals dd {
+  margin: 0.25rem 0 0;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.studio-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+  margin-block-end: 1.25rem;
+}
+
+.studio-form,
+.studio-form fieldset {
+  display: grid;
+  gap: 1rem;
+}
+
+.studio-form fieldset {
+  min-width: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.studio :is(form label) {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 700;
+}
+
+.studio :is(input:not([type="checkbox"]), textarea, select) {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--color-black);
+  background: #fffdf7;
+  color: var(--color-black);
+  font: 1rem var(--font-body);
+}
+
+.studio textarea {
+  resize: vertical;
+}
+
+.studio label small {
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.studio form .studio-checkbox {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.studio-checkbox input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--color-black);
+}
+
+.studio-table-scroll {
+  overflow-x: auto;
+  margin-block-end: 1.25rem;
+}
+
+.studio-table {
+  width: 100%;
+  min-width: 30rem;
+  border-collapse: collapse;
+  text-align: start;
+}
+
+.studio-table :is(th, td) {
+  padding: 0.7rem 0.85rem;
+  border-bottom: var(--border-thin);
+  text-align: start;
+}
+
+.studio-table thead {
+  background: var(--color-black);
+  color: var(--color-paper);
+}
+
+.studio-table small {
+  display: block;
+  margin-block-start: 0.25rem;
+  font-weight: 400;
+}
+
+.studio-status {
+  padding: 0.25rem 0.45rem;
+  border: 1px solid var(--color-black);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.studio-status[data-status="PUBLISHED"],
+.studio-success {
+  background: var(--color-lime);
+}
+
+.studio-status[data-status="ARCHIVED"] {
+  background: var(--color-black);
+  color: var(--color-paper);
+}
+
+.studio-notice,
+.studio-error,
+.studio-success {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-inline-start: 4px solid var(--color-black);
+}
+
+.studio-notice {
+  border: var(--border-thin);
+}
+
+.studio-error {
+  background: var(--color-orange);
+}
+
+.studio-preview {
+  align-self: start;
+  padding: 0 1rem 1rem;
+  border: var(--border-thin);
+  background: var(--color-black);
+  color: var(--color-paper);
+}
+
+.studio-preview :focus-visible {
+  outline-color: var(--color-lime);
+}
+
+.studio-preview-image {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  margin-block-end: 1rem;
+  background: var(--color-charcoal);
+}
+
+.studio-preview-image img {
+  object-fit: contain;
+}
+
+.studio-login {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding-block: 2rem;
+  background: var(--color-orange);
+}
+
+.studio-login-panel {
+  display: grid;
+  gap: 0.85rem;
+  width: min(100%, 30rem);
+  padding: clamp(1.25rem, 5vw, 2.75rem);
+  border: 2px solid var(--color-black);
+  background: var(--color-paper);
+  box-shadow: 6px 6px 0 var(--color-black);
+}
+
+.studio-login-panel p {
+  margin-block-start: 0;
+}
+
+.studio-key {
+  font-family: monospace;
+  letter-spacing: 0.03em;
+}
+
+.studio-setup-qr {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 780px) {
+  .studio-edit-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .studio-totals,
+  .studio-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.studio-article-form {
+  max-width: 62rem;
+}
+
+.studio-article-form > fieldset {
+  padding-block: 1rem;
+  border-block-start: 2px solid var(--color-black);
+}
+
+.studio-article-form legend {
+  font-weight: 800;
+  padding-inline-end: 0.6rem;
+}
+
+.studio-article-form .studio-article-block {
+  padding: 0.75rem;
+  border: 1px solid var(--color-black);
+}
+
+.studio-article-row {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.studio-article-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem;
+  margin-block-end: 0.75rem;
+}
+
+.studio-article-tools button {
+  min-height: 44px;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--color-black);
+  background: var(--color-paper);
+  color: var(--color-black);
+  cursor: pointer;
+}
+
+.studio-article-tools button:hover:not(:disabled) {
+  background: var(--color-lime);
+}

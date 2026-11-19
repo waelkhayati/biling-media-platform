@@ -1,8 +1,11 @@
 import { CommunityCallout } from "@/components/community-callout";
+import { ContentLink } from "@/components/content-link";
 import { MediaPlaceholder, SectionLabel } from "@/components/editorial-ui";
+import { ArticleCards } from "@/components/editorial-articles";
 import { SiteHeader } from "@/components/site-header";
 import { YouTubeMedia } from "@/components/youtube-media";
-import { getHomeContent } from "@/lib/content-api";
+import { getArticles, getHomeContent } from "@/lib/content-api";
+import { episodePath, showPath } from "@/lib/content-paths";
 import type { PublishedEpisodeSummary, PublishedShowSummary } from "@biling/contracts";
 
 const tickerItems = [
@@ -31,7 +34,8 @@ function ProductionCard({
       {episode?.youtubeVideoId ? (
         <YouTubeMedia
           videoId={episode.youtubeVideoId}
-          title={episode.title}
+          title={`Explore ${show.title}`}
+          href={showPath(show.slug)}
           className={mediaClassName}
         />
       ) : (
@@ -42,7 +46,9 @@ function ProductionCard({
         />
       )}
       <div className="content-caption">
-        <strong>{show.title}</strong>
+        <strong>
+          <ContentLink href={showPath(show.slug)}>{show.title}</ContentLink>
+        </strong>
         <span>
           {show.episodeCount} {show.episodeCount === 1 ? "episode" : "episodes"}
         </span>
@@ -58,7 +64,8 @@ function EpisodeCard({ episode }: { episode: PublishedEpisodeSummary }) {
       {episode.youtubeVideoId ? (
         <YouTubeMedia
           videoId={episode.youtubeVideoId}
-          title={episode.title}
+          title={`Watch ${episode.title}`}
+          href={episodePath(episode.showSlug, episode.slug)}
           className="episode-placeholder"
         />
       ) : (
@@ -69,7 +76,11 @@ function EpisodeCard({ episode }: { episode: PublishedEpisodeSummary }) {
         />
       )}
       <div className="content-caption">
-        <strong>{episode.title}</strong>
+        <strong>
+          <ContentLink href={episodePath(episode.showSlug, episode.slug)}>
+            {episode.title}
+          </ContentLink>
+        </strong>
         <span>{episode.showTitle}</span>
       </div>
     </article>
@@ -77,7 +88,14 @@ function EpisodeCard({ episode }: { episode: PublishedEpisodeSummary }) {
 }
 
 export default async function HomePage() {
-  const { shows, episodes } = await getHomeContent();
+  const [{ shows, episodes }, featuredArticles, latestArticles] = await Promise.all([
+    getHomeContent(),
+    getArticles({ featured: "true", limit: 3 }).catch(() => null),
+    getArticles({ limit: 3 }).catch(() => null),
+  ]);
+  const articleItems = featuredArticles?.items.length
+    ? featuredArticles.items
+    : (latestArticles?.items ?? []);
   const featuredShow = shows.find((show) => show.featured) ?? shows[0];
   const additionalShows = featuredShow ? shows.filter((show) => show.id !== featuredShow.id) : [];
 
@@ -115,7 +133,8 @@ export default async function HomePage() {
             {featuredShow?.latestEpisode?.youtubeVideoId ? (
               <YouTubeMedia
                 videoId={featuredShow.latestEpisode.youtubeVideoId}
-                title={featuredShow.latestEpisode.title}
+                title={`Explore ${featuredShow.title}`}
+                href={showPath(featuredShow.slug)}
                 className="hero-media"
               />
             ) : (
@@ -202,11 +221,16 @@ export default async function HomePage() {
                 Room for the real stories.
               </h2>
             </div>
-            <p className="section-aside">
-              {shows.length
-                ? "Discover published Biling productions and watch their latest episodes."
-                : "Published Biling productions will appear here as they are added to the catalogue."}
-            </p>
+            <div>
+              <p className="section-aside">
+                {shows.length
+                  ? "Discover published Biling productions and watch their latest episodes."
+                  : "Published Biling productions will appear here as they are added to the catalogue."}
+              </p>
+              <ContentLink className="detail-link" href="/shows">
+                Browse all productions <span aria-hidden="true">↗</span>
+              </ContentLink>
+            </div>
           </div>
           {featuredShow ? (
             <div className="production-grid">
@@ -290,13 +314,25 @@ export default async function HomePage() {
         </section>
 
         <CommunityCallout />
+        <section className="section page-gutter" id="editorial" aria-labelledby="home-editorial">
+          <div className="section-heading">
+            <h2 id="home-editorial" className="section-title">
+              Articles
+            </h2>
+            <ContentLink className="detail-link" href="/articles">
+              Browse articles
+            </ContentLink>
+          </div>
+          {!!articleItems.length && <ArticleCards articles={articleItems} lead />}
+        </section>
       </main>
       <footer className="site-footer page-gutter" id="community">
         <span className="footer-brand">
           Biling Media <span className="footer-slogan">In art we trust.</span>
         </span>
         <nav className="footer-nav" aria-label="Footer navigation">
-          <a href="#productions">Productions</a>
+          <ContentLink href="/shows">Productions</ContentLink>
+          <ContentLink href="/search">Search</ContentLink>
           <a href="#live">Live</a>
           <a href="#people">People</a>
         </nav>

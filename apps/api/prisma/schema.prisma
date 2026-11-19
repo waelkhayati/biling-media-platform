@@ -13,6 +13,82 @@ enum ContentStatus {
   ARCHIVED
 }
 
+enum StaffRole {
+  ADMIN
+  EDITOR
+}
+
+enum StaffChallengeKind {
+  INVITE
+  SETUP
+  RECOVERY
+  ENROLL
+  MFA
+}
+
+model StaffAccount {
+  id           String           @id @default(cuid())
+  email        String           @unique
+  passwordHash String
+  role         StaffRole
+  active       Boolean          @default(true)
+  createdAt    DateTime         @default(now())
+  sessions     StaffSession[]
+  challenges   StaffChallenge[]
+  authVersion  Int              @default(0)
+  mfaSecret    String?
+  lastTotpStep Int?
+}
+
+model StaffSession {
+  tokenHash   String       @id @db.Char(64)
+  accountId   String
+  account     StaffAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  authVersion Int
+
+  @@index([accountId])
+  @@index([expiresAt])
+}
+
+model StaffChallenge {
+  tokenHash   String             @id @db.Char(64)
+  accountId   String
+  account     StaffAccount       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  kind        StaffChallengeKind
+  authVersion Int
+  expiresAt   DateTime
+  attempts    Int                @default(0)
+  secret      String?
+
+  @@index([accountId, kind])
+  @@index([expiresAt])
+}
+
+model StudioAuditEvent {
+  id             String         @id @default(cuid())
+  actorId        String?
+  actor          String
+  resource       String
+  resourceId     String
+  title          String
+  action         String
+  previousStatus ContentStatus?
+  nextStatus     ContentStatus?
+  createdAt      DateTime       @default(now())
+
+  @@index([createdAt, id])
+  @@index([resource, createdAt, id])
+}
+
+model StaffLoginThrottle {
+  key          String   @id @db.Char(64)
+  attempts     Int
+  windowEndsAt DateTime
+
+  @@index([windowEndsAt])
+}
+
 model User {
   id          String   @id @default(cuid())
   email       String   @unique
@@ -22,37 +98,73 @@ model User {
 }
 
 model Show {
-  id          String        @id @default(cuid())
-  title       String
-  slug        String        @unique
-  description String?       @db.Text
-  posterUrl   String?
-  featured    Boolean       @default(false)
-  status      ContentStatus @default(DRAFT)
-  metadata    Json?
-  episodes    Episode[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  description      String?       @db.Text
+  posterUrl        String?
+  featured         Boolean       @default(false)
+  status           ContentStatus @default(DRAFT)
+  metadata         Json?
+  firstPublishedAt DateTime?
+  episodes         Episode[]
+  articles         Article[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   @@index([status, createdAt])
 }
 
 model Episode {
-  id              String        @id @default(cuid())
-  showId          String
-  show            Show          @relation(fields: [showId], references: [id], onDelete: Cascade)
-  title           String
-  slug            String
-  description     String?       @db.Text
-  episodeNumber   Int?
-  durationSeconds Int?
-  youtubeVideoId  String?       @unique @db.VarChar(11)
-  status          ContentStatus @default(DRAFT)
-  publishedAt     DateTime?
-  metadata        Json?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id               String        @id @default(cuid())
+  showId           String
+  show             Show          @relation(fields: [showId], references: [id], onDelete: Cascade)
+  title            String
+  slug             String
+  description      String?       @db.Text
+  episodeNumber    Int?
+  durationSeconds  Int?
+  youtubeVideoId   String?       @unique @db.VarChar(11)
+  status           ContentStatus @default(DRAFT)
+  publishedAt      DateTime?
+  firstPublishedAt DateTime?
+  metadata         Json?
+  articles         Article[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   @@unique([showId, slug])
   @@index([showId, status, publishedAt])
+}
+
+model Article {
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  title            String
+  excerpt          String?
+  body             Json
+  author           String
+  category         String
+  tags             String[]
+  language         String        @default("en")
+  imageUrl         String?
+  imageAlt         String?
+  imageCaption     String?
+  imageCredit      String?
+  featured         Boolean       @default(false)
+  status           ContentStatus @default(DRAFT)
+  publishedAt      DateTime?
+  firstPublishedAt DateTime?
+  seoTitle         String?
+  seoDescription   String?
+  shows            Show[]
+  episodes         Episode[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([status, publishedAt, id])
+  @@index([status, category, publishedAt])
+  @@index([status, featured, publishedAt])
+  @@index([author, updatedAt])
+  @@index([tags], type: Gin)
 }

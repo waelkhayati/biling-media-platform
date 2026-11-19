@@ -5,9 +5,11 @@ import { AppConfigModule } from "./config/config.module";
 import { ContentModule } from "./content/content.module";
 import { PrismaModule } from "./database/prisma.module";
 import { HealthModule } from "./health/health.module";
+import { AdminModule } from "./admin/admin.module";
+import { ArticleModule } from "./articles/article.module";
 
 @Module({
-  imports: [AppConfigModule, PrismaModule, HealthModule, ContentModule],
+  imports: [AppConfigModule, PrismaModule, HealthModule, ContentModule, AdminModule, ArticleModule],
   providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }],
 })
 export class AppModule {}

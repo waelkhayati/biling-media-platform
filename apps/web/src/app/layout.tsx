@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { siteUrl } from "@/lib/content-metadata";
 import "./globals.css";
+import "./articles/editorial.css";
+import "./shows/detail.css";
+import "./discovery.css";
 
 export const metadata: Metadata = {
+  metadataBase: siteUrl(),
   title: {
     default: "Biling Media — In Art We Trust",
     template: "%s | Biling",

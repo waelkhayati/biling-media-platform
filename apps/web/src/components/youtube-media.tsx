@@ -1,24 +1,22 @@
 import Image from "next/image";
+import { youtubeThumbnail } from "@/lib/content-paths";
+import { ContentLink } from "./content-link";
 
 export function YouTubeMedia({
   videoId,
   title,
+  href,
   className = "",
 }: {
   videoId: string;
   title: string;
+  href: string;
   className?: string;
 }) {
   return (
-    <a
-      className={`youtube-media ${className}`.trim()}
-      href={`https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`}
-      target="_blank"
-      rel="noreferrer"
-      aria-label={`Watch ${title} on YouTube (opens in a new tab)`}
-    >
+    <ContentLink className={`youtube-media ${className}`.trim()} href={href} aria-label={title}>
       <Image
-        src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+        src={youtubeThumbnail(videoId)}
         alt=""
         fill
         sizes="(max-width: 600px) 90vw, (max-width: 1000px) 60vw, 45vw"
@@ -27,6 +25,6 @@ export function YouTubeMedia({
       <span className="youtube-play" aria-hidden="true">
         ▶
       </span>
-    </a>
+    </ContentLink>
   );
 }

@@ -31,6 +31,7 @@ async function bootstrap(): Promise<void> {
     .setTitle("Biling Media API")
     .setDescription("Versioned REST API for Biling Media.")
     .setVersion("1.0")
+    .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "opaque" }, "staff")
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup("api/v1/docs", app, document);
