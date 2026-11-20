@@ -4,11 +4,15 @@ import { ArticleCards } from "@/components/editorial-articles";
 import { ContentLink } from "@/components/content-link";
 import { EpisodeArchive, EpisodeFacts } from "@/components/episode-archive";
 import { YouTubePlayer } from "@/components/youtube-player";
+import { CommunityPanel } from "@/components/community-panel";
 import { getArticles, getEpisode } from "@/lib/content-api";
 import { contentMetadata } from "@/lib/content-metadata";
 import { episodePath, showPath, youtubeThumbnail } from "@/lib/content-paths";
 
-type EpisodePageProps = { params: Promise<{ slug: string; episodeSlug: string }> };
+type EpisodePageProps = {
+  params: Promise<{ slug: string; episodeSlug: string }>;
+  searchParams: Promise<{ commentsPage?: string; commentsSort?: string }>;
+};
 
 async function loadEpisode(params: EpisodePageProps["params"]) {
   const { slug, episodeSlug } = await params;
@@ -27,12 +31,17 @@ export async function generateMetadata({ params }: EpisodePageProps): Promise<Me
   });
 }
 
-export default async function EpisodePage({ params }: EpisodePageProps) {
+export default async function EpisodePage({ params, searchParams }: EpisodePageProps) {
   const { episode, show, relatedEpisodes } = await loadEpisode(params);
   const editorial = await getArticles({ show: show.slug, episode: episode.slug, limit: 3 }).catch(
     () => null,
   );
   const productionPath = showPath(show.slug);
+  const communityQuery = await searchParams;
+  const commentsPage = /^\d{1,4}$/.test(communityQuery.commentsPage ?? "")
+    ? Math.max(1, Number(communityQuery.commentsPage))
+    : 1;
+  const commentsSort = communityQuery.commentsSort === "oldest" ? "oldest" : "newest";
 
   return (
     <>
@@ -105,6 +114,12 @@ export default async function EpisodePage({ params }: EpisodePageProps) {
           <ArticleCards articles={editorial.items} />
         </section>
       )}
+      <CommunityPanel
+        target={{ type: "episode", showSlug: show.slug, slug: episode.slug }}
+        path={episodePath(show.slug, episode.slug)}
+        page={commentsPage}
+        sort={commentsSort}
+      />
     </>
   );
 }

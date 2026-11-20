@@ -7,7 +7,7 @@ import { siteUrl } from "./content-metadata";
 
 function studioOrigin() {
   const defaultOrigin =
-    process.env.VERCEL_ENV === "production" ? siteUrl().origin : "http://localhost:3000";
+    process.env.VERCEL_ENV === "production" ? siteUrl().origin : "http://127.0.0.1:3000";
   const url = new URL(process.env.ADMIN_WEB_ORIGIN ?? defaultOrigin);
   const loopback = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
   if (
@@ -63,7 +63,7 @@ async function sessionToken() {
 }
 
 export async function studioRequest(path: string, init: RequestInit = {}, authenticate = true) {
-  const base = new URL(process.env.API_BASE_URL ?? "http://localhost:3001/api/v1");
+  const base = new URL(process.env.API_BASE_URL ?? "http://127.0.0.1:3001/api/v1");
   if (
     base.protocol !== "https:" &&
     !(base.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(base.hostname))

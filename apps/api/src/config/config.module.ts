@@ -14,7 +14,7 @@ function loadConfiguration(): AppConfiguration {
       .uri({ scheme: ["postgres", "postgresql"] })
       .required(),
     PORT: Joi.number().port().default(3001),
-    CORS_ORIGIN: Joi.string().default("http://localhost:3000"),
+    CORS_ORIGIN: Joi.string().default("http://127.0.0.1:3000"),
     NODE_ENV: Joi.string().valid("development", "test", "production").default("development"),
   })
     .unknown(true)

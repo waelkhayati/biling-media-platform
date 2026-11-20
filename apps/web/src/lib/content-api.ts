@@ -13,7 +13,7 @@ import {
 } from "@biling/schemas";
 import { episodePath, showPath } from "./content-paths";
 
-const apiBaseUrl = (process.env.API_BASE_URL ?? "http://localhost:3001/api/v1").replace(/\/$/, "");
+const apiBaseUrl = (process.env.API_BASE_URL ?? "http://127.0.0.1:3001/api/v1").replace(/\/$/, "");
 const notFound = Symbol("content not found");
 
 const showsResponseSchema = z.object({

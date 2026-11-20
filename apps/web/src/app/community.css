@@ -1,0 +1,212 @@
+.community-shell {
+  padding-block: clamp(3rem, 7vw, 7rem);
+  border-top: 8px solid var(--orange);
+  background: var(--paper);
+  color: var(--black);
+}
+.community-actions {
+  display: flex;
+  margin-bottom: 2rem;
+}
+.community-button {
+  min-height: 46px;
+  padding: 0.7rem 1.1rem;
+  border: 2px solid currentColor;
+  border-radius: 0;
+  background: var(--black);
+  color: var(--paper);
+  font:
+    800 0.9rem/1 Arial,
+    sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+.community-button.active {
+  background: var(--lime);
+  color: var(--black);
+}
+.community-button span {
+  margin-left: 0.45rem;
+  font-variant-numeric: tabular-nums;
+}
+.community-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.community-signin {
+  display: inline-block;
+  margin-top: 0.65rem;
+  color: inherit;
+  font-size: 0.8rem;
+}
+.community-discussion {
+  max-width: 900px;
+}
+.community-heading {
+  display: grid;
+  grid-template-columns: minmax(9rem, 1fr) 3fr;
+  gap: 1rem;
+  align-items: end;
+  border-bottom: 4px solid var(--black);
+  margin-bottom: 1.5rem;
+}
+.community-heading span {
+  padding-bottom: 0.8rem;
+  color: var(--orange);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.community-heading h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+.community-composer {
+  display: grid;
+  gap: 0.7rem;
+  margin: 1rem 0 2rem;
+}
+.community-composer textarea,
+.community-comment textarea,
+.community-comment select {
+  box-sizing: border-box;
+  width: 100%;
+  border: 2px solid var(--black);
+  border-radius: 0;
+  padding: 0.85rem;
+  background: #fff;
+  color: var(--black);
+  font: inherit;
+}
+.community-composer .community-button {
+  justify-self: start;
+}
+.community-feedback {
+  margin: 0.5rem 0;
+  font-weight: 700;
+}
+.community-auth-prompt {
+  padding: 1.2rem;
+  border: 2px solid var(--black);
+  background: var(--lime);
+}
+.community-sort,
+.community-pages {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.community-sort a,
+.community-pages a {
+  border: 2px solid var(--black);
+  padding: 0.55rem 0.75rem;
+  color: inherit;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.community-sort a[aria-current="page"] {
+  background: var(--orange);
+  color: white;
+}
+.community-comments {
+  display: grid;
+  gap: 1rem;
+}
+.community-comment {
+  padding: 1.2rem;
+  border: 2px solid var(--black);
+  background: #fff;
+  box-shadow: 5px 5px 0 var(--black);
+  overflow-wrap: anywhere;
+}
+.community-comment header {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+.community-comment header span {
+  display: block;
+  color: #555;
+  font-size: 0.82rem;
+}
+.community-avatar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  overflow: hidden;
+  background: var(--orange);
+  color: white;
+  font-weight: 900;
+}
+.community-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.community-comment details {
+  margin-top: 0.8rem;
+}
+.community-comment details summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+.community-comment details form {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+}
+.community-comment details button {
+  justify-self: start;
+  min-height: 40px;
+  border: 0;
+  padding: 0.6rem 0.85rem;
+  background: var(--black);
+  color: white;
+  font-weight: 800;
+}
+.community-replies {
+  display: grid;
+  gap: 0.8rem;
+  margin: 1rem 0 0 clamp(0.6rem, 5vw, 3rem);
+  padding-left: 1rem;
+  border-left: 5px solid var(--orange);
+}
+.community-replies .community-comment {
+  box-shadow: none;
+}
+.community-unavailable {
+  padding-block: 3rem;
+  background: var(--paper);
+}
+.followed-shows {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+.followed-show {
+  border-top: 2px solid currentColor;
+  padding-top: 0.75rem;
+}
+.followed-show a {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: inherit;
+  text-transform: uppercase;
+}
+@media (max-width: 600px) {
+  .community-heading {
+    grid-template-columns: 1fr;
+  }
+  .community-heading span {
+    padding-bottom: 0;
+  }
+  .community-replies {
+    margin-left: 0.25rem;
+  }
+}

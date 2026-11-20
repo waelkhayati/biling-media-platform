@@ -2,6 +2,56 @@
   min-height: 100vh;
 }
 
+.moderation-list {
+  display: grid;
+  gap: 1.5rem;
+}
+.moderation-card {
+  border: 2px solid var(--black);
+  padding: 1.2rem;
+  background: var(--paper);
+  box-shadow: 6px 6px 0 var(--orange);
+}
+.moderation-card header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-bottom: 2px solid currentColor;
+  padding-bottom: 0.6rem;
+}
+.moderation-card h2 {
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+.moderation-controls {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: 0.8rem;
+  align-items: end;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--black);
+}
+.moderation-controls label {
+  display: grid;
+  gap: 0.3rem;
+  font-weight: 700;
+}
+.moderation-controls select,
+.moderation-controls textarea {
+  border: 2px solid var(--black);
+  border-radius: 0;
+  padding: 0.55rem;
+  font: inherit;
+}
+@media (max-width: 800px) {
+  .moderation-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
 .studio :is(h1, h2) {
   font-family: var(--font-display);
   line-height: 1;

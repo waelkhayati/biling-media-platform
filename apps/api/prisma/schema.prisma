@@ -90,81 +90,249 @@ model StaffLoginThrottle {
 }
 
 model User {
-  id          String   @id @default(cuid())
-  email       String   @unique
-  displayName String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String              @id @default(cuid())
+  email            String              @unique
+  username         String?             @unique
+  passwordHash     String?
+  displayName      String?
+  biography        String?
+  avatarUrl        String?
+  emailVerifiedAt  DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  sessions         AudienceSession[]
+  challenges       AudienceChallenge[]
+  comments         CommunityComment[]
+  commentReports   CommentReport[]
+  articleReactions ArticleReaction[]
+  episodeReactions EpisodeReaction[]
+  followedShows    ShowFollow[]
+}
+
+enum AudienceChallengeKind {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
+model AudienceSession {
+  tokenHash String   @id @db.Char(64)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model AudienceChallenge {
+  tokenHash String                @id @db.Char(64)
+  userId    String
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      AudienceChallengeKind
+  expiresAt DateTime
+
+  @@unique([userId, kind])
+  @@index([expiresAt])
+}
+
+model AudienceThrottle {
+  key          String   @id @db.Char(64)
+  attempts     Int
+  windowEndsAt DateTime
+
+  @@index([windowEndsAt])
 }
 
 model Show {
-  id               String        @id @default(cuid())
+  id               String             @id @default(cuid())
   title            String
-  slug             String        @unique
-  description      String?       @db.Text
+  slug             String             @unique
+  description      String?            @db.Text
   posterUrl        String?
-  featured         Boolean       @default(false)
-  status           ContentStatus @default(DRAFT)
+  featured         Boolean            @default(false)
+  status           ContentStatus      @default(DRAFT)
   metadata         Json?
   firstPublishedAt DateTime?
   episodes         Episode[]
   articles         Article[]
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  comments         CommunityComment[]
+  followers        ShowFollow[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 
   @@index([status, createdAt])
 }
 
 model Episode {
-  id               String        @id @default(cuid())
+  id               String             @id @default(cuid())
   showId           String
-  show             Show          @relation(fields: [showId], references: [id], onDelete: Cascade)
+  show             Show               @relation(fields: [showId], references: [id], onDelete: Cascade)
   title            String
   slug             String
-  description      String?       @db.Text
+  description      String?            @db.Text
   episodeNumber    Int?
   durationSeconds  Int?
-  youtubeVideoId   String?       @unique @db.VarChar(11)
-  status           ContentStatus @default(DRAFT)
+  youtubeVideoId   String?            @unique @db.VarChar(11)
+  status           ContentStatus      @default(DRAFT)
   publishedAt      DateTime?
   firstPublishedAt DateTime?
   metadata         Json?
   articles         Article[]
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  comments         CommunityComment[]
+  reactions        EpisodeReaction[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 
   @@unique([showId, slug])
   @@index([showId, status, publishedAt])
 }
 
 model Article {
-  id               String        @id @default(cuid())
-  slug             String        @unique
+  id               String             @id @default(cuid())
+  slug             String             @unique
   title            String
   excerpt          String?
   body             Json
   author           String
   category         String
   tags             String[]
-  language         String        @default("en")
+  language         String             @default("en")
   imageUrl         String?
   imageAlt         String?
   imageCaption     String?
   imageCredit      String?
-  featured         Boolean       @default(false)
-  status           ContentStatus @default(DRAFT)
+  featured         Boolean            @default(false)
+  status           ContentStatus      @default(DRAFT)
   publishedAt      DateTime?
   firstPublishedAt DateTime?
   seoTitle         String?
   seoDescription   String?
   shows            Show[]
   episodes         Episode[]
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  comments         CommunityComment[]
+  reactions        ArticleReaction[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 
   @@index([status, publishedAt, id])
   @@index([status, category, publishedAt])
   @@index([status, featured, publishedAt])
   @@index([author, updatedAt])
   @@index([tags], type: Gin)
+}
+
+enum CommunityCommentStatus {
+  VISIBLE
+  HIDDEN
+  REMOVED
+}
+
+enum CommunityReactionType {
+  LIKE
+}
+
+enum CommentReportReason {
+  SPAM
+  HARASSMENT
+  HATEFUL
+  SEXUAL
+  VIOLENCE
+  MISINFORMATION
+  OTHER
+}
+
+enum CommentReportStatus {
+  OPEN
+  REVIEWED
+  DISMISSED
+}
+
+model CommunityComment {
+  id        String                 @id @default(cuid())
+  userId    String
+  user      User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  articleId String?
+  article   Article?               @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  episodeId String?
+  episode   Episode?               @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  showId    String?
+  show      Show?                  @relation(fields: [showId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    CommunityComment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   CommunityComment[]     @relation("CommentReplies")
+  body      String                 @db.VarChar(2000)
+  status    CommunityCommentStatus @default(VISIBLE)
+  reports   CommentReport[]
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+
+  @@index([articleId, status, createdAt, id])
+  @@index([episodeId, status, createdAt, id])
+  @@index([showId, status, createdAt, id])
+  @@index([parentId, status, createdAt, id])
+  @@index([userId, createdAt])
+}
+
+model CommentReport {
+  id         String              @id @default(cuid())
+  commentId  String
+  comment    CommunityComment    @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reporterId String
+  reporter   User                @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  reason     CommentReportReason
+  details    String?             @db.VarChar(500)
+  status     CommentReportStatus @default(OPEN)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  @@unique([commentId, reporterId])
+  @@index([status, createdAt, id])
+}
+
+model ArticleReaction {
+  userId    String
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  articleId String
+  article   Article               @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  type      CommunityReactionType @default(LIKE)
+  createdAt DateTime              @default(now())
+
+  @@id([userId, articleId, type])
+  @@index([articleId, type])
+}
+
+model EpisodeReaction {
+  userId    String
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episodeId String
+  episode   Episode               @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  type      CommunityReactionType @default(LIKE)
+  createdAt DateTime              @default(now())
+
+  @@id([userId, episodeId, type])
+  @@index([episodeId, type])
+}
+
+model ShowFollow {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  showId    String
+  show      Show     @relation(fields: [showId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, showId])
+  @@index([showId])
+}
+
+model CommunityModerationEvent {
+  id        String   @id @default(cuid())
+  actorId   String
+  actor     String
+  commentId String
+  action    String
+  note      String?  @db.VarChar(500)
+  createdAt DateTime @default(now())
+
+  @@index([commentId, createdAt, id])
+  @@index([createdAt, id])
 }

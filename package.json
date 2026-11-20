@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "turbo run dev",
+    "dev:setup": "pnpm run db:up && pnpm --filter @biling/api exec prisma migrate deploy && pnpm run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",

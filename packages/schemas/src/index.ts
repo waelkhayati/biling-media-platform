@@ -5,6 +5,8 @@ import { contentSlugSchema, showStatusSchema, youtubeVideoIdSchema } from "./con
 
 export { contentSlugSchema, showStatusSchema, youtubeVideoIdSchema };
 export * from "./admin.js";
+export * from "./audience.js";
+export * from "./community.js";
 
 export const createShowSchema = z.object({
   title: z.string().trim().min(1).max(120),

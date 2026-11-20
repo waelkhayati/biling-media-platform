@@ -5,6 +5,8 @@ import "./globals.css";
 import "./articles/editorial.css";
 import "./shows/detail.css";
 import "./discovery.css";
+import "./audience.css";
+import "./community.css";
 
 export const metadata: Metadata = {
   metadataBase: siteUrl(),

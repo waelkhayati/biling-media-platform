@@ -16,6 +16,8 @@ import {
   staffOtpInputSchema,
   staffRecoveryInputSchema,
   staffSessionSchema,
+  moderationActionSchema,
+  communityIdSchema,
 } from "@biling/schemas";
 import type { StaffInvitation } from "@biling/contracts";
 import {
@@ -194,6 +196,33 @@ export async function signOut(): Promise<FormState> {
     return { error: "Could not revoke your session. Try again." };
   }
   redirect("/admin/login");
+}
+
+export async function moderateCommunityComment(
+  id: string,
+  _state: FormState,
+  form: FormData,
+): Promise<FormState> {
+  if (!(await sameStudioOrigin()))
+    return { error: "Moderate from the configured Admin Studio address." };
+  const input = moderationActionSchema.safeParse({
+    action: form.get("action"),
+    note: nullable(form, "note"),
+  });
+  if (!input.success || !communityIdSchema.safeParse(id).success)
+    return { error: "Invalid moderation request." };
+  try {
+    const response = await studioRequest(`/community/comments/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(input.data),
+    });
+    if (!response.ok)
+      return { error: await apiMessage(response, "Could not apply the moderation action.") };
+  } catch {
+    return { error: "Could not confirm the moderation action." };
+  }
+  revalidatePath("/admin/community");
+  return {};
 }
 
 function nullable(form: FormData, name: string) {

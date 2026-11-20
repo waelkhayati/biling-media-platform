@@ -7,11 +7,15 @@ import { ContentLink } from "@/components/content-link";
 import { SectionLabel } from "@/components/editorial-ui";
 import { EpisodeArchive } from "@/components/episode-archive";
 import { YouTubePlayer } from "@/components/youtube-player";
+import { CommunityPanel } from "@/components/community-panel";
 import { getArticles, getShow } from "@/lib/content-api";
 import { contentMetadata } from "@/lib/content-metadata";
 import { episodePath, showPath, youtubeThumbnail } from "@/lib/content-paths";
 
-type ShowPageProps = { params: Promise<{ slug: string }> };
+type ShowPageProps = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ commentsPage?: string; commentsSort?: string }>;
+};
 
 async function loadShow(params: ShowPageProps["params"]) {
   const { slug } = await params;
@@ -42,11 +46,16 @@ export async function generateMetadata({ params }: ShowPageProps): Promise<Metad
   });
 }
 
-export default async function ShowPage({ params }: ShowPageProps) {
+export default async function ShowPage({ params, searchParams }: ShowPageProps) {
   const show = await loadShow(params);
   const editorial = await getArticles({ show: show.slug, limit: 3 }).catch(() => null);
   const { poster, featuredEpisode, trailerId } = showMedia(show);
   const coverVideoId = trailerId ?? featuredEpisode?.youtubeVideoId;
+  const communityQuery = await searchParams;
+  const commentsPage = /^\d{1,4}$/.test(communityQuery.commentsPage ?? "")
+    ? Math.max(1, Number(communityQuery.commentsPage))
+    : 1;
+  const commentsSort = communityQuery.commentsSort === "oldest" ? "oldest" : "newest";
 
   return (
     <>
@@ -145,6 +154,12 @@ export default async function ShowPage({ params }: ShowPageProps) {
           <ArticleCards articles={editorial.items} />
         </section>
       )}
+      <CommunityPanel
+        target={{ type: "show", slug: show.slug }}
+        path={showPath(show.slug)}
+        page={commentsPage}
+        sort={commentsSort}
+      />
     </>
   );
 }

@@ -7,8 +7,12 @@ import { SiteHeader } from "@/components/site-header";
 import { getArticle } from "@/lib/content-api";
 import { contentMetadata, siteUrl } from "@/lib/content-metadata";
 import { episodePath, showPath } from "@/lib/content-paths";
+import { CommunityPanel } from "@/components/community-panel";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ commentsPage?: string; commentsSort?: string }>;
+};
 const load = cache(getArticle);
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -33,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ArticlePage({ params }: Props) {
+export default async function ArticlePage({ params, searchParams }: Props) {
   const article = await load((await params).slug);
   if (!article) notFound();
   const url = new URL(articleHref(article.slug), siteUrl()).href;
@@ -51,6 +55,11 @@ export default async function ArticlePage({ params }: Props) {
     author: { "@type": "Person", name: article.author },
     publisher: { "@type": "Organization", name: "Biling Media", url: siteUrl().origin },
   };
+  const communityQuery = await searchParams;
+  const commentsPage = /^\d{1,4}$/.test(communityQuery.commentsPage ?? "")
+    ? Math.max(1, Number(communityQuery.commentsPage))
+    : 1;
+  const commentsSort = communityQuery.commentsSort === "oldest" ? "oldest" : "newest";
 
   return (
     <>
@@ -124,6 +133,12 @@ export default async function ArticlePage({ params }: Props) {
           </section>
         )}
       </main>
+      <CommunityPanel
+        target={{ type: "article", slug: article.slug }}
+        path={articleHref(article.slug)}
+        page={commentsPage}
+        sort={commentsSort}
+      />
     </>
   );
 }
