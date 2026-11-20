@@ -62,7 +62,14 @@ export async function signIn(_state: FormState, form: FormData): Promise<FormSta
     );
     if (!response.ok)
       return { error: await apiMessage(response, "Sign-in is temporarily unavailable.") };
-    const challenge = staffChallengeSchema.parse(await response.json());
+    const payload: unknown = await response.json();
+    const localSession = staffSessionSchema.safeParse(payload);
+    if (localSession.success) {
+      await clearStudioChallenge();
+      await setStudioSession(localSession.data.token, localSession.data.expiresAt);
+      redirect("/admin");
+    }
+    const challenge = staffChallengeSchema.parse(payload);
     await setStudioChallenge(challenge.token, challenge.expiresAt);
   } catch {
     return { error: "Sign-in is temporarily unavailable. Try again." };

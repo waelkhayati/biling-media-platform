@@ -1,6 +1,6 @@
 import { BrandLogo } from "./brand-logo";
-import { ContentLink } from "./content-link";
 import { DiscoveryForm } from "./discovery-form";
+import { PrimaryNavigation } from "./primary-navigation";
 
 export function SiteHeader({ onDiscovery = true }: { onDiscovery?: boolean }) {
   const home = onDiscovery ? "" : "/";
@@ -11,12 +11,7 @@ export function SiteHeader({ onDiscovery = true }: { onDiscovery?: boolean }) {
         <BrandLogo />
         <span>Biling Media</span>
       </a>
-      <nav className="main-nav" aria-label="Main navigation">
-        <ContentLink href="/shows">Productions</ContentLink>
-        <ContentLink href="/articles">Articles</ContentLink>
-        <a href={`${home}#episodes`}>Episodes</a>
-        <a href={`${home}#people`}>People</a>
-      </nav>
+      <PrimaryNavigation home={home} />
       <DiscoveryForm
         action="/search"
         className="header-search"

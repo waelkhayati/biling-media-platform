@@ -1,4 +1,4 @@
-# Biling Media — Project Handoff
+# Biling Media - Project Handoff
 
 **Last repository inspection:** 2026-11-19
 **Purpose:** Accurate continuation notes for the current Biling Media repository. This document distinguishes implemented behavior from plans and from deployment state reported earlier in the development conversation.
@@ -115,13 +115,13 @@ Key direct/resolved versions from the manifests and lockfile include:
 
 The public App Router has five application routes. They load published content from the API on demand (`cache: "no-store"`). Staff routes are listed under [Admin Studio](#14-admin-studio).
 
-| Route | Behavior |
-| --- | --- |
-| `/` | Discovery homepage with links into the production and episode pages. |
-| `/search?q=...` | Title and description search with grouped results and suggested production titles before a search or when no matches are found. |
-| `/shows` | All published productions, with the first featured production highlighted and filters for text and featured status. |
-| `/shows/[slug]` | Production title, optional description and cover art, metadata, trailer or featured episode, and the entire published archive newest first. |
-| `/shows/[slug]/episodes/[episodeSlug]` | YouTube embed, publication date, optional duration and episode number, parent show, and up to three related episodes. |
+| Route                                  | Behavior                                                                                                                                    |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                                    | Discovery homepage with links into the production and episode pages.                                                                        |
+| `/search?q=...`                        | Title and description search with grouped results and suggested production titles before a search or when no matches are found.             |
+| `/shows`                               | All published productions, with the first featured production highlighted and filters for text and featured status.                         |
+| `/shows/[slug]`                        | Production title, optional description and cover art, metadata, trailer or featured episode, and the entire published archive newest first. |
+| `/shows/[slug]/episodes/[episodeSlug]` | YouTube embed, publication date, optional duration and episode number, parent show, and up to three related episodes.                       |
 
 Both detail routes have canonical URLs, Open Graph and Twitter card metadata, loading feedback during in-app navigation, and a 404 screen for invalid or unavailable content. API failures use a retryable detail error boundary. Published shows with no episodes and episode pages with no related items display an empty state.
 
@@ -180,15 +180,15 @@ The API uses `helmet`, CORS allow-list configuration, Nest `ValidationPipe` with
 
 ### Implemented endpoints
 
-| Method and path        | Implemented behavior                                                                                                   |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `GET /api/v1/health`   | Returns `{ status: "ok", timestamp: "<ISO date>" }`.                                                                   |
-| `GET /api/v1/shows`    | Returns published shows ordered featured-first then newest, with published episode count and latest published episode. Accepts optional `q`, `featured=true\|false`, and `limit=1..24`. |
-| `GET /api/v1/episodes` | Returns up to 12 latest published episodes with show identity, ordered by publication then creation time.              |
-| `GET /api/v1/search?q=...` | Returns `shows`, `episodes`, and a per-group `hasMore` flag. The optional `limit` is 1–24 items per group and defaults to 12. |
-| `GET /api/v1/shows/:slug` | Returns a published show, whitelisted metadata, and its full published episode archive ordered newest first. |
-| `GET /api/v1/shows/:slug/episodes/:episodeSlug` | Returns the published episode, its published parent show, and up to three other published episodes from that show. |
-| `GET /api/v1/docs`     | Swagger UI for the API.                                                                                                |
+| Method and path                                 | Implemented behavior                                                                                                                                                                    |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/v1/health`                            | Returns `{ status: "ok", timestamp: "<ISO date>" }`.                                                                                                                                    |
+| `GET /api/v1/shows`                             | Returns published shows ordered featured-first then newest, with published episode count and latest published episode. Accepts optional `q`, `featured=true\|false`, and `limit=1..24`. |
+| `GET /api/v1/episodes`                          | Returns up to 12 latest published episodes with show identity, ordered by publication then creation time.                                                                               |
+| `GET /api/v1/search?q=...`                      | Returns `shows`, `episodes`, and a per-group `hasMore` flag. The optional `limit` is 1–24 items per group and defaults to 12.                                                           |
+| `GET /api/v1/shows/:slug`                       | Returns a published show, whitelisted metadata, and its full published episode archive ordered newest first.                                                                            |
+| `GET /api/v1/shows/:slug/episodes/:episodeSlug` | Returns the published episode, its published parent show, and up to three other published episodes from that show.                                                                      |
+| `GET /api/v1/docs`                              | Swagger UI for the API.                                                                                                                                                                 |
 
 The detail API returns HTTP 400 for invalid slugs and HTTP 404 for missing or unpublished content. An episode is public when its own status and its parent show's status are `PUBLISHED` and it has a publication date. Public endpoints remain read-only and the show archive is unpaginated. Content mutations are under the separate `/api/v1/admin` prefix.
 
@@ -224,17 +224,17 @@ For manual development content, use Prisma Studio locally and never expose it pu
 
 `.env.example` documents local defaults. Copy it to an ignored root `.env`; do not commit `.env` or paste secret values into handoff notes.
 
-| Variable                                            | Purpose                                                                                                                    |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`                                      | PostgreSQL connection URI; required by the API and Prisma.                                                                 |
-| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | Local Compose database settings, with development-only defaults in the example/Compose file.                               |
-| `PORT`                                              | API listen port; defaults to 3001. Railway supplies its own port.                                                          |
-| `CORS_ORIGIN`                                       | Comma-separated allowed origin(s); defaults to `http://localhost:3000`. Configure the exact deployed web origin if needed. |
-| `API_BASE_URL`                                      | Web server API origin including `/api/v1`; defaults to `http://localhost:3001/api/v1`.                                     |
-| `SITE_URL` | Optional web origin for absolute canonical URLs and social metadata. Defaults to the current public Vercel domain. |
-| `ADMIN_WEB_ORIGIN` | Exact origin accepted by Admin Studio form actions. Defaults to the canonical site origin on Vercel production and `http://localhost:3000` locally. Set it explicitly for other hosts. |
-| `STAFF_MFA_KEY` | API-only 32-byte base64url secret for encrypting authenticator seeds. Persist it across API restarts and instances using the same database. |
-| `NODE_ENV`                                          | Validated as `development`, `test`, or `production`.                                                                       |
+| Variable                                            | Purpose                                                                                                                                                                                |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                      | PostgreSQL connection URI; required by the API and Prisma.                                                                                                                             |
+| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | Local Compose database settings, with development-only defaults in the example/Compose file.                                                                                           |
+| `PORT`                                              | API listen port; defaults to 3001. Railway supplies its own port.                                                                                                                      |
+| `CORS_ORIGIN`                                       | Comma-separated allowed origin(s); defaults to `http://localhost:3000`. Configure the exact deployed web origin if needed.                                                             |
+| `API_BASE_URL`                                      | Web server API origin including `/api/v1`; defaults to `http://localhost:3001/api/v1`.                                                                                                 |
+| `SITE_URL`                                          | Optional web origin for absolute canonical URLs and social metadata. Defaults to the current public Vercel domain.                                                                     |
+| `ADMIN_WEB_ORIGIN`                                  | Exact origin accepted by Admin Studio form actions. Defaults to the canonical site origin on Vercel production and `http://localhost:3000` locally. Set it explicitly for other hosts. |
+| `STAFF_MFA_KEY`                                     | API-only 32-byte base64url secret for encrypting authenticator seeds. Persist it across API restarts and instances using the same database.                                            |
+| `NODE_ENV`                                          | Validated as `development`, `test`, or `production`.                                                                                                                                   |
 
 From PowerShell at the repository root:
 
@@ -407,30 +407,30 @@ Administrators use **Staff** to suspend or restore accounts or revoke their curr
 
 ### Web routes and API
 
-| Web route | Purpose |
-| --- | --- |
-| `/admin/login` | Staff sign-in. |
-| `/admin/signup` | Accept an operator-issued staff invitation and choose a password. |
-| `/admin/mfa`, `/admin/recovery` | Authenticator verification or first enrollment, and operator-assisted recovery. |
-| `/admin` | Protected overview. |
-| `/admin/shows`, `/admin/episodes` | Protected, filtered lists with 50 records per page. |
-| `/admin/shows/new`, `/admin/episodes/new` | Create a production or episode. |
-| `/admin/shows/[id]`, `/admin/episodes/[id]` | Edit and manage publication status. |
-| `/admin/staff`, `/admin/audit` | Administrator access management and paginated activity. |
+| Web route                                   | Purpose                                                                         |
+| ------------------------------------------- | ------------------------------------------------------------------------------- |
+| `/admin/login`                              | Staff sign-in.                                                                  |
+| `/admin/signup`                             | Accept an operator-issued staff invitation and choose a password.               |
+| `/admin/mfa`, `/admin/recovery`             | Authenticator verification or first enrollment, and operator-assisted recovery. |
+| `/admin`                                    | Protected overview.                                                             |
+| `/admin/shows`, `/admin/episodes`           | Protected, filtered lists with 50 records per page.                             |
+| `/admin/shows/new`, `/admin/episodes/new`   | Create a production or episode.                                                 |
+| `/admin/shows/[id]`, `/admin/episodes/[id]` | Edit and manage publication status.                                             |
+| `/admin/staff`, `/admin/audit`              | Administrator access management and paginated activity.                         |
 
-| Methods and API paths | Purpose |
-| --- | --- |
-| `POST /api/v1/admin/auth/login` | Exchange a staff email and password for an expiring sign-in challenge, with a setup code for an unenrolled account. |
-| `GET /api/v1/admin/auth/challenge`, `POST /api/v1/admin/auth/verify` | Read challenge details and exchange a valid authenticator code for the staff bearer session. |
-| `POST /api/v1/admin/auth/recover` | Redeem an operator-issued recovery code, reset access, and start authenticator re-enrollment. |
-| `POST /api/v1/admin/auth/signup` | Redeem an invitation for a pending staff account and start authenticator enrollment. |
-| `GET /api/v1/admin/auth/me`, `POST /api/v1/admin/auth/logout` | Check identity or revoke the active session. |
-| `GET /api/v1/admin/dashboard`, `GET /api/v1/admin/show-options` | Counts, recent edits, and production choices for episode forms. |
-| `GET` and `POST /api/v1/admin/shows`, `GET` and `PATCH /api/v1/admin/shows/:id` | List, create, read, or update shows. |
-| `GET` and `POST /api/v1/admin/episodes`, `GET` and `PATCH /api/v1/admin/episodes/:id` | List, create, read, or update episodes. |
-| `GET /api/v1/admin/staff`, `POST /api/v1/admin/staff/:id/access` | Administrator-only staff roster, suspension, restoration, and revocation. |
-| `POST /api/v1/admin/staff/invitations` | Issue or replace a one-time invitation. Requires an active administrator session. |
-| `GET /api/v1/admin/audit` | Filterable, paginated activity. Staff security events require the administrator role. |
+| Methods and API paths                                                                 | Purpose                                                                                                             |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `POST /api/v1/admin/auth/login`                                                       | Exchange a staff email and password for an expiring sign-in challenge, with a setup code for an unenrolled account. |
+| `GET /api/v1/admin/auth/challenge`, `POST /api/v1/admin/auth/verify`                  | Read challenge details and exchange a valid authenticator code for the staff bearer session.                        |
+| `POST /api/v1/admin/auth/recover`                                                     | Redeem an operator-issued recovery code, reset access, and start authenticator re-enrollment.                       |
+| `POST /api/v1/admin/auth/signup`                                                      | Redeem an invitation for a pending staff account and start authenticator enrollment.                                |
+| `GET /api/v1/admin/auth/me`, `POST /api/v1/admin/auth/logout`                         | Check identity or revoke the active session.                                                                        |
+| `GET /api/v1/admin/dashboard`, `GET /api/v1/admin/show-options`                       | Counts, recent edits, and production choices for episode forms.                                                     |
+| `GET` and `POST /api/v1/admin/shows`, `GET` and `PATCH /api/v1/admin/shows/:id`       | List, create, read, or update shows.                                                                                |
+| `GET` and `POST /api/v1/admin/episodes`, `GET` and `PATCH /api/v1/admin/episodes/:id` | List, create, read, or update episodes.                                                                             |
+| `GET /api/v1/admin/staff`, `POST /api/v1/admin/staff/:id/access`                      | Administrator-only staff roster, suspension, restoration, and revocation.                                           |
+| `POST /api/v1/admin/staff/invitations`                                                | Issue or replace a one-time invitation. Requires an active administrator session.                                   |
+| `GET /api/v1/admin/audit`                                                             | Filterable, paginated activity. Staff security events require the administrator role.                               |
 
 Swagger documents the staff bearer scheme and authoring payloads. The browser uses HttpOnly, SameSite=Strict cookies and exact Origin checks on staff form actions. Hosted cookies require HTTPS and use a host-only `__Host-` prefix. NestJS stores salted scrypt password hashes, digests of opaque tokens, and AES-GCM-encrypted TOTP seeds. MFA challenges expire after ten minutes, allow five OTP attempts, and consume the accepted TOTP step to prevent replay. Sessions expire after eight hours. Password sign-in permits eight attempts per email and 60 per API-observed IP in ten minutes. Recovery permits 20 attempts per API-observed IP in ten minutes. Deployments behind a proxy may share the IP bucket. The API bearer contract can be used by a future native client over HTTPS.
 
@@ -455,21 +455,21 @@ The Phase 5 local preview uses [the website on port 3100](http://127.0.0.1:3100/
 
 ### Routes and API
 
-| Route | Behavior |
-| --- | --- |
-| `/articles` | Featured and latest publications, categories, tag filters and pagination. |
-| `/articles/[slug]` | Published article, byline, media, related articles and productions, sharing and article metadata. |
-| `/sitemap.xml` | Public root routes and published article URLs. |
-| `/admin/articles` | Staff list filtered by status, category and byline. |
-| `/admin/articles/new`, `/admin/articles/[id]` | Staff article editor. |
-| `/admin/articles/[id]/preview` | Private preview of the saved article, including drafts. |
-| `GET /api/v1/articles` | Published summaries, with optional category, tag, featured, show and episode filters. Supports page and limit (1–24). |
-| `GET /api/v1/articles/:slug` | Published body and related content. Drafts and archived articles return 404. |
-| `GET /api/v1/articles/sitemap` | Published slugs and modification dates for the sitemap. |
-| `GET /api/v1/search` | Adds a bounded article group matching title, excerpt, byline or category. |
-| `GET /api/v1/admin/articles`, `POST /api/v1/admin/articles` | Filter staff list or create an article. |
-| `GET /api/v1/admin/articles/:id`, `PATCH /api/v1/admin/articles/:id` | Read any publication state or update using the current revision. |
-| `GET /api/v1/admin/article-options` | Related production and episode choices and existing byline/category suggestions. |
+| Route                                                                | Behavior                                                                                                              |
+| -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `/articles`                                                          | Featured and latest publications, categories, tag filters and pagination.                                             |
+| `/articles/[slug]`                                                   | Published article, byline, media, related articles and productions, sharing and article metadata.                     |
+| `/sitemap.xml`                                                       | Public root routes and published article URLs.                                                                        |
+| `/admin/articles`                                                    | Staff list filtered by status, category and byline.                                                                   |
+| `/admin/articles/new`, `/admin/articles/[id]`                        | Staff article editor.                                                                                                 |
+| `/admin/articles/[id]/preview`                                       | Private preview of the saved article, including drafts.                                                               |
+| `GET /api/v1/articles`                                               | Published summaries, with optional category, tag, featured, show and episode filters. Supports page and limit (1–24). |
+| `GET /api/v1/articles/:slug`                                         | Published body and related content. Drafts and archived articles return 404.                                          |
+| `GET /api/v1/articles/sitemap`                                       | Published slugs and modification dates for the sitemap.                                                               |
+| `GET /api/v1/search`                                                 | Adds a bounded article group matching title, excerpt, byline or category.                                             |
+| `GET /api/v1/admin/articles`, `POST /api/v1/admin/articles`          | Filter staff list or create an article.                                                                               |
+| `GET /api/v1/admin/articles/:id`, `PATCH /api/v1/admin/articles/:id` | Read any publication state or update using the current revision.                                                      |
+| `GET /api/v1/admin/article-options`                                  | Related production and episode choices and existing byline/category suggestions.                                      |
 
 The homepage features selected articles alongside the existing production sections. Shows and episodes display links to articles associated with them. Staff writes reuse the existing role policy, transaction-backed audit history, opaque bearer sessions and origin checks. Rich text is rendered as React elements from validated blocks. HTTPS images load directly from their host, and only validated YouTube IDs are embedded.
 

@@ -1,6 +1,6 @@
-# AI Continuation Prompt — Biling Media
+# AI Continuation Prompt - Biling Media
 
-You are continuing development of **Biling Media**, an original Tunisian entertainment platform centered on Biling-owned productions, shows, episodes, personalities, live programming, and community. The current product goal is a realistic, maintainable MVP—not a generic streaming clone and not an implementation of every future monetization idea.
+You are continuing development of **Biling Media**, an original Tunisian entertainment platform centered on Biling-owned productions, shows, episodes, personalities, live programming, and community. The current product goal is a realistic, maintainable MVP - not a generic streaming clone and not an implementation of every future monetization idea.
 
 ## Read and inspect first
 
@@ -12,7 +12,7 @@ You are continuing development of **Biling Media**, an original Tunisian enterta
 
 - This is a pnpm 10.34.9/Turborepo monorepo: `apps/web` is Next.js App Router + React + TypeScript; `apps/api` is a NestJS REST API; PostgreSQL and Prisma persist data; `packages/contracts`, `packages/schemas`, and `packages/config` contain shared contracts, Zod schemas, and TypeScript configuration.
 - Keep backend business logic and API contracts independent of Next.js so a future React Native + Expo client can use the same backend, data models, and business rules.
-- Share genuinely client-neutral contracts, schemas, brand assets, or tokens where useful—not web React components. The native app is future work and must not be created now.
+- Share genuinely client-neutral contracts, schemas, brand assets, or tokens where useful - not web React components. The native app is future work and must not be created now.
 - The website should remain responsive and preserve its desktop experience. Do not simply shrink it to imitate a native app; consider touch targets, accessible focus, small-screen layout, and avoid essential hover-only interactions.
 - Preserve the Biling visual identity: “In art we trust,” orange `#ff4b0b`, near-black `#090909`, lime `#c8ff00`, paper `#f5f0e6`, bold editorial display type, and the supplied logo used unchanged. The current logo lockup has padding and an orange background, with no black border. Use labeled placeholders until Biling-approved, rights-cleared assets are supplied.
 - The current repository includes show and episode pages, discovery and grouped search, staff authentication with MFA and recovery, Admin Studio, and editorial publishing with structured article blocks. Verify the deployed revision separately from the working tree. Audience accounts and the native app remain future work.
