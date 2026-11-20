@@ -22,10 +22,11 @@
 .detail-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(4rem, 11vw, 10rem);
-  font-weight: 900;
-  line-height: 0.93;
-  text-transform: uppercase;
+  font-size: clamp(3.5rem, 9.5vw, 8.5rem);
+  font-weight: 400;
+  letter-spacing: -0.018em;
+  line-height: 1;
+  text-transform: none;
   text-align: start;
   overflow-wrap: anywhere;
 }
@@ -53,7 +54,7 @@
 
 .show-cover {
   border: 2px solid var(--color-black);
-  box-shadow: 8px 8px 0 var(--color-black);
+  box-shadow: none;
 }
 
 .show-cover img,
@@ -274,7 +275,16 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .show-cover {
-    box-shadow: 5px 5px 0 var(--color-black);
+  .detail-section,
+  .detail-message {
+    padding-block: var(--space-5);
+  }
+
+  .detail-title {
+    font-size: clamp(3rem, 15vw, 4.75rem);
+  }
+
+  .episode-show {
+    padding: var(--space-3);
   }
 }

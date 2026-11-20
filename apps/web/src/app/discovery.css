@@ -72,7 +72,7 @@
 .catalog-masthead .discovery-form {
   max-width: 44rem;
   margin-block-start: 1.5rem;
-  box-shadow: 5px 5px 0 var(--color-black);
+  box-shadow: none;
 }
 
 .catalog-masthead input,
@@ -209,10 +209,11 @@
 
 .catalog-card-title h3 {
   margin: 0;
-  font: 900 clamp(1.65rem, 3.6vw, 3.6rem) / 1 var(--font-display);
+  font: 400 clamp(1.5rem, 3.2vw, 3.15rem) / 1.08 var(--font-display);
+  letter-spacing: -0.012em;
   overflow-wrap: anywhere;
   text-align: start;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .catalog-card:hover h3,
@@ -275,6 +276,28 @@
 }
 
 @media (max-width: 560px) {
+  .discovery-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .discovery-form button {
+    border-inline-start: 0;
+    border-block-start: 1px solid var(--color-black);
+  }
+
+  .catalog-masthead,
+  .catalog-body {
+    padding-block: var(--space-4);
+  }
+
+  .catalog-card-title {
+    align-items: flex-start;
+  }
+
+  .catalog-card-title h3 {
+    font-size: clamp(1.75rem, 10vw, 2.5rem);
+  }
+
   .catalog-grid {
     grid-template-columns: minmax(0, 1fr);
   }

@@ -263,7 +263,7 @@ The project will follow a structured development workflow:
 
 The platform will be developed incrementally.
 
-### Phase 1 — Foundation
+### Phase 1 - Foundation
 
 - Repository and tooling setup.
 - Application scaffolding.
@@ -274,7 +274,7 @@ The platform will be developed incrementally.
 - Initial deployment.
 - Content management foundation.
 
-### Phase 2 — Core Platform
+### Phase 2 - Core Platform
 
 - Content discovery.
 - Shows and episodes.
@@ -284,7 +284,7 @@ The platform will be developed incrementally.
 - Comments and reactions.
 - Administration and moderation.
 
-### Phase 3 — Engagement
+### Phase 3 - Engagement
 
 - Interactive games.
 - Challenges and competitions.
@@ -292,7 +292,7 @@ The platform will be developed incrementally.
 - Premium subscriptions.
 - Livestream interactions.
 
-### Phase 4 — Monetization
+### Phase 4 - Monetization
 
 - Merchandise.
 - Events and ticketing.
@@ -301,7 +301,7 @@ The platform will be developed incrementally.
 - Payment integrations.
 - Experiences and giveaways.
 
-### Phase 5 — Expansion
+### Phase 5 - Expansion
 
 - Native mobile applications using React Native and Expo.
 - Advanced analytics.

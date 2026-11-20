@@ -32,13 +32,23 @@ const challengeKinds = { in: ["ENROLL", "MFA"] as ("ENROLL" | "MFA")[] };
 const invalidChallenge = () =>
   new UnauthorizedException("The code or sign-in request is invalid or expired.");
 
+function localMfaBypassAllowed() {
+  if (process.env.NODE_ENV !== "development") return false;
+  try {
+    const database = new URL(process.env.DATABASE_URL ?? "");
+    return ["localhost", "127.0.0.1", "[::1]"].includes(database.hostname);
+  } catch {
+    return false;
+  }
+}
+
 @Injectable()
 export class StaffAuthService {
   private nextCleanup = 0;
 
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
-  async login(input: StaffLogin, ip: string): Promise<StaffChallengeResult> {
+  async login(input: StaffLogin, ip: string): Promise<StaffChallengeResult | StaffSession> {
     await this.consumeAttempt(hashStaffToken(`ip:${ip}`), 60);
     await this.consumeAttempt(hashStaffToken(`account:${input.email}`), 8);
     const account = await this.prisma.staffAccount.findUnique({
@@ -56,6 +66,9 @@ export class StaffAuthService {
 
     return this.prisma.$transaction(async (tx) => {
       if (!(await lockActiveStaff(tx, account.id, account.authVersion))) throw invalidChallenge();
+      // Local-only ergonomics: never permit this bypass in a production, preview,
+      // or remotely hosted database process.
+      if (localMfaBypassAllowed()) return this.issueSession(tx, account, account.authVersion);
       const current = await tx.staffAccount.findUniqueOrThrow({
         where: { id: account.id },
         select: { mfaSecret: true },

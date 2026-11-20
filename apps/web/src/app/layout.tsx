@@ -11,7 +11,7 @@ import "./community.css";
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
   title: {
-    default: "Biling Media — In Art We Trust",
+    default: "Biling Media - In Art We Trust",
     template: "%s | Biling",
   },
   description:

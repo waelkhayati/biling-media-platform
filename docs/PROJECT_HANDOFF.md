@@ -1,4 +1,4 @@
-# Biling Media — Project Handoff
+# Biling Media - Project Handoff
 
 **Last repository inspection:** 2026-11-20
 **Purpose:** Accurate continuation notes for the current Biling Media repository. This document distinguishes implemented behavior from plans and from deployment state reported earlier in the development conversation.

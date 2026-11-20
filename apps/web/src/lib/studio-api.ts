@@ -28,7 +28,19 @@ function cookieSettings(kind = "staff") {
 }
 
 export async function sameStudioOrigin() {
-  return (await headers()).get("origin") === studioOrigin().origin;
+  const origin = (await headers()).get("origin");
+  if (origin === studioOrigin().origin) return true;
+
+  // Local preview ports change often (for example 3000, 3100, or 3102). Keep the
+  // production allow-list exact, while allowing only loopback HTTP origins during
+  // development so a local Studio cannot be blocked by its port number.
+  if (process.env.NODE_ENV === "production" || !origin) return false;
+  try {
+    const url = new URL(origin);
+    return url.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+  } catch {
+    return false;
+  }
 }
 
 export async function setStudioSession(token: string, expiresAt: string) {

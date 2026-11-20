@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { BrandLogo } from "./brand-logo";
-import { ContentLink } from "./content-link";
 import { DiscoveryForm } from "./discovery-form";
+import { PrimaryNavigation } from "./primary-navigation";
 
 export function SiteHeaderFrame({
   onDiscovery = true,
@@ -16,14 +16,9 @@ export function SiteHeaderFrame({
     <header className="site-header page-gutter">
       <a className="brand-lockup" href={`${home}#top`} aria-label="Biling Media home">
         <BrandLogo />
-        <span>Biling Media</span>
+        <span className="brand-wordmark">Biling</span>
       </a>
-      <nav className="main-nav" aria-label="Main navigation">
-        <ContentLink href="/shows">Productions</ContentLink>
-        <ContentLink href="/articles">Articles</ContentLink>
-        <a href={`${home}#episodes`}>Episodes</a>
-        <a href={`${home}#people`}>People</a>
-      </nav>
+      <PrimaryNavigation home={home} actions={account} />
       <DiscoveryForm
         action="/search"
         className="header-search"

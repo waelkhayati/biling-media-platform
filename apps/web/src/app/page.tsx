@@ -150,7 +150,7 @@ export default async function HomePage() {
             )}
           </div>
           <div className="hero-bottomline">
-            <span>In art we trust</span>
+            <span>Navigate</span>
             <span>Culture / conversation / everything in between</span>
             <a href="#live" aria-label="Jump to the live broadcast section">
               ↓
@@ -158,7 +158,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <div className="ticker" aria-label="In art we trust — Biling Media">
+        <div className="ticker" aria-label="In art we trust - Biling Media">
           <span className="ticker-label">In art we trust</span>
           <div className="ticker-window" aria-hidden="true">
             <div className="ticker-track">
