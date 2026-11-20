@@ -9,7 +9,7 @@ export function SiteHeader({ onDiscovery = true }: { onDiscovery?: boolean }) {
     <header className="site-header page-gutter">
       <a className="brand-lockup" href={`${home}#top`} aria-label="Biling Media home">
         <BrandLogo />
-        <span>Biling Media</span>
+        <span className="brand-wordmark">Biling</span>
       </a>
       <PrimaryNavigation home={home} />
       <DiscoveryForm

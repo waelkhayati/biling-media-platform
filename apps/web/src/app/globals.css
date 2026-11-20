@@ -121,13 +121,22 @@ button:focus-visible {
 .brand-lockup {
   display: inline-flex;
   width: fit-content;
-  min-height: 38px;
+  min-height: 42px;
   align-items: center;
-  gap: 10px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.07em;
+  gap: 8px;
+  color: var(--color-black);
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 3vw, 2.625rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-decoration: none;
   text-transform: uppercase;
+}
+
+.brand-wordmark {
+  display: block;
+  transform: translateY(0.03em);
 }
 
 .brand-logo {
@@ -1014,7 +1023,6 @@ button:focus-visible {
 @media (max-width: 600px) {
   .brand-lockup {
     gap: 7px;
-    font-size: 10px;
   }
 
   .brand-logo {
@@ -1564,6 +1572,26 @@ button:focus-visible {
 
   .nav-toggle {
     display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .section-title,
+  .live-title,
+  .community-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.012em;
+    line-height: 1.04;
+  }
+
+  .section-title,
+  .community-title {
+    font-size: clamp(2.4rem, 10vw, 3.9rem);
+  }
+
+  .live-title {
+    font-size: clamp(2.4rem, 10vw, 3.9rem);
   }
 }
 
