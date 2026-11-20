@@ -150,7 +150,7 @@ export default async function HomePage() {
             )}
           </div>
           <div className="hero-bottomline">
-            <span>In art we trust</span>
+            <span>Navigate</span>
             <span>Culture / conversation / everything in between</span>
             <a href="#live" aria-label="Jump to the live broadcast section">
               ↓
