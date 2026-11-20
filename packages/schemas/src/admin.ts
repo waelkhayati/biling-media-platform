@@ -44,6 +44,16 @@ export const staffRecoveryInputSchema = z.strictObject({
 export const staffAccessActionSchema = z.strictObject({
   action: z.enum(["DISABLE", "ENABLE", "REVOKE"]),
 });
+export const staffInviteInputSchema = z.strictObject({
+  email: staffEmailSchema,
+  role: staffRoleSchema,
+});
+export const staffInvitationSchema = staffInviteInputSchema.extend({
+  code: staffTokenSchema,
+  expiresAt: z.iso.datetime(),
+});
+export type StaffInviteInput = z.infer<typeof staffInviteInputSchema>;
+export type StaffInvitation = z.infer<typeof staffInvitationSchema>;
 export const staffAuditQuerySchema = z.object({
   kind: z.enum(["SHOW", "EPISODE", "ARTICLE", "STAFF"]).optional(),
   page: z

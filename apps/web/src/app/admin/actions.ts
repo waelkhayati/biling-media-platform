@@ -10,11 +10,14 @@ import {
   staffAccessActionSchema,
   staffChallengeSchema,
   staffContentIdSchema,
+  staffInvitationSchema,
+  staffInviteInputSchema,
   staffLoginSchema,
   staffOtpInputSchema,
   staffRecoveryInputSchema,
   staffSessionSchema,
 } from "@biling/schemas";
+import type { StaffInvitation } from "@biling/contracts";
 import {
   clearStudioSession,
   clearStudioChallenge,
@@ -150,6 +153,33 @@ export async function changeStudioAccess(
   }
   revalidatePath("/admin/staff");
   redirect("/admin/staff?updated=1");
+}
+
+export async function inviteStudioStaff(
+  _state: FormState & { invitation?: StaffInvitation },
+  form: FormData,
+): Promise<FormState & { invitation?: StaffInvitation }> {
+  if (!(await sameStudioOrigin()))
+    return { error: "Send invitations from the configured Studio address." };
+  const input = staffInviteInputSchema.safeParse({
+    email: form.get("email"),
+    role: form.get("role"),
+  });
+  if (!input.success) return { error: "Enter a valid email and staff role." };
+  let invitation: StaffInvitation;
+  try {
+    const response = await studioRequest("/staff/invitations", {
+      method: "POST",
+      body: JSON.stringify(input.data),
+    });
+    if (!response.ok)
+      return { error: await apiMessage(response, "Could not create the invitation.") };
+    invitation = staffInvitationSchema.parse(await response.json());
+  } catch {
+    return { error: "Could not confirm the invitation. Check the Staff list before trying again." };
+  }
+  revalidatePath("/admin/staff");
+  return { invitation };
 }
 
 export async function signOut(): Promise<FormState> {

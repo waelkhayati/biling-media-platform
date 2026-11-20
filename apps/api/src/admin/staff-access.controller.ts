@@ -20,9 +20,11 @@ import {
   staffAccessActionSchema,
   staffAuditQuerySchema,
   staffContentIdSchema,
+  staffInviteInputSchema,
 } from "@biling/schemas";
 import { PrismaService } from "../database/prisma.service";
-import { clearStaffCredentials } from "./staff-security";
+import { issueStaffInvitation } from "./staff-invitation";
+import { clearStaffCredentials, hashStaffToken, pendingStaffPasswordHash } from "./staff-security";
 import { StaffGuard, type StaffRequest } from "./staff.guard";
 
 function requireAdmin(request: StaffRequest) {
@@ -43,9 +45,49 @@ export class StaffAccessController {
     requireAdmin(request);
     const accounts = await this.prisma.staffAccount.findMany({
       orderBy: { email: "asc" },
-      select: { id: true, email: true, role: true, active: true, mfaSecret: true },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        active: true,
+        mfaSecret: true,
+        passwordHash: true,
+      },
     });
-    return accounts.map(({ mfaSecret, ...row }) => ({ ...row, enrolled: mfaSecret !== null }));
+    return accounts.map(({ mfaSecret, passwordHash, ...row }) => ({
+      ...row,
+      enrolled: mfaSecret !== null,
+      pendingInvitation: passwordHash === pendingStaffPasswordHash,
+    }));
+  }
+
+  @Post("staff/invitations")
+  @ApiOperation({ summary: "Issue a one-time invitation for a new staff account" })
+  async invite(@Req() request: StaffRequest, @Body() body: unknown) {
+    requireAdmin(request);
+    const input = staffInviteInputSchema.safeParse(body);
+    if (!input.success) throw new BadRequestException("Enter a valid email and staff role.");
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT "id" FROM "StaffAccount" WHERE "role" = 'ADMIN' ORDER BY "id" FOR UPDATE`;
+      const session = await tx.staffSession.findUnique({
+        where: {
+          tokenHash: hashStaffToken(request.staffToken),
+          accountId: request.staff.id,
+          expiresAt: { gt: new Date() },
+          account: { active: true, role: "ADMIN", mfaSecret: { not: null } },
+        },
+        select: { authVersion: true, account: { select: { authVersion: true } } },
+      });
+      if (!session || session.authVersion !== session.account.authVersion)
+        throw new ForbiddenException("Administrator access required.");
+      const invitation = await issueStaffInvitation(tx, input.data, request.staff);
+      if (!invitation)
+        throw new ConflictException(
+          "This email already has an account or an invitation for a different role.",
+        );
+      return invitation;
+    });
   }
 
   @Post("staff/:id/access")

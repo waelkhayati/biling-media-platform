@@ -1,5 +1,6 @@
 import type { StaffAccessRow } from "@biling/contracts";
 import { StudioStaffForm } from "@/components/studio-staff-form";
+import { StudioStaffInviteForm } from "@/components/studio-staff-invite-form";
 import { readStudio, requireStudioAccount } from "@/lib/studio-api";
 import { notFound } from "next/navigation";
 
@@ -17,6 +18,7 @@ export default async function StudioStaffPage({
       <div className="studio-heading">
         <h1>Staff access</h1>
       </div>
+      <StudioStaffInviteForm />
       <p>
         Suspending an account blocks sign-in and ends its sessions. Revoking sessions keeps the
         account active.
@@ -48,7 +50,13 @@ export default async function StudioStaffPage({
                 <th scope="row">{row.email}</th>
                 <td>{row.role === "ADMIN" ? "Administrator" : "Editor"}</td>
                 <td>{row.active ? "Active" : "Suspended"}</td>
-                <td>{row.enrolled ? "Enrolled" : "Setup required"}</td>
+                <td>
+                  {row.pendingInvitation
+                    ? "Invitation pending"
+                    : row.enrolled
+                      ? "Enrolled"
+                      : "Setup required"}
+                </td>
                 <td>
                   {row.id === account.id ? (
                     "Current account"

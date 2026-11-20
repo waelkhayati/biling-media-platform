@@ -373,7 +373,9 @@ Use `EDITOR` when provisioning an editor. Run the command once per staff member 
 
 ### Authenticator setup and recovery
 
-New staff can accept an invitation at `/admin/signup`. A trusted operator runs `staff:access-code` with `STAFF_EMAIL`, `STAFF_CODE_PURPOSE=INVITE`, and an optional `STAFF_ROLE` (default `EDITOR`). This reserves an account for that email. The invitation expires after 15 minutes and can be reissued for the same pending account and role. Existing accounts use setup or recovery codes. At signup, the invitee chooses a password and must verify an authenticator before receiving a staff session.
+Administrators can open **Admin Studio → Staff → Invite staff**, enter an email, and choose Editor or Administrator. Share the one-time invitation code privately with the invitee. They enter it at `/admin/signup`, choose a password, and verify an authenticator before receiving a staff session. They use the invited email for later sign-ins. An invitation expires after 15 minutes. To replace it, issue a fresh invitation with the same email and role.
+
+The first administrator still needs a trusted operator. To create their invitation, run `staff:access-code` with `STAFF_EMAIL`, `STAFF_CODE_PURPOSE=INVITE`, and `STAFF_ROLE=ADMIN` against the intended Studio database. Existing accounts use setup or recovery codes.
 
 Configure the API's `STAFF_MFA_KEY` before the first enrollment. Generate a random 32-byte base64url value with Node's `crypto.randomBytes(32).toString("base64url")`. Store it in the ignored local `.env` for development or a secret manager for hosting. Back it up securely. Replacing it without migrating encrypted seeds makes existing authenticator registrations unreadable.
 
@@ -427,6 +429,7 @@ Administrators use **Staff** to suspend or restore accounts or revoke their curr
 | `GET` and `POST /api/v1/admin/shows`, `GET` and `PATCH /api/v1/admin/shows/:id` | List, create, read, or update shows. |
 | `GET` and `POST /api/v1/admin/episodes`, `GET` and `PATCH /api/v1/admin/episodes/:id` | List, create, read, or update episodes. |
 | `GET /api/v1/admin/staff`, `POST /api/v1/admin/staff/:id/access` | Administrator-only staff roster, suspension, restoration, and revocation. |
+| `POST /api/v1/admin/staff/invitations` | Issue or replace a one-time invitation. Requires an active administrator session. |
 | `GET /api/v1/admin/audit` | Filterable, paginated activity. Staff security events require the administrator role. |
 
 Swagger documents the staff bearer scheme and authoring payloads. The browser uses HttpOnly, SameSite=Strict cookies and exact Origin checks on staff form actions. Hosted cookies require HTTPS and use a host-only `__Host-` prefix. NestJS stores salted scrypt password hashes, digests of opaque tokens, and AES-GCM-encrypted TOTP seeds. MFA challenges expire after ten minutes, allow five OTP attempts, and consume the accepted TOTP step to prevent replay. Sessions expire after eight hours. Password sign-in permits eight attempts per email and 60 per API-observed IP in ten minutes. Recovery permits 20 attempts per API-observed IP in ten minutes. Deployments behind a proxy may share the IP bucket. The API bearer contract can be used by a future native client over HTTPS.

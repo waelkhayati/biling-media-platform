@@ -11,6 +11,8 @@ jest.mock("../src/database/prisma.service", () => ({ PrismaService: class Prisma
 
 const prisma = {
   staffAccount: {
+    upsert: jest.fn(),
+    findMany: jest.fn(),
     findUnique: jest.fn(),
     findUniqueOrThrow: jest.fn(),
     updateMany: jest.fn(),
@@ -276,6 +278,92 @@ describe("Admin Studio HTTP API", () => {
     expect(prisma.studioAuditEvent.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { resource: { in: ["SHOW", "EPISODE", "ARTICLE"] } } }),
     );
+  });
+
+  it("rejects unauthenticated, editor and revoked invitation requests before changing accounts", async () => {
+    const input = { email: "new-staff@example.test", role: "EDITOR" };
+    expect((await request("/staff/invitations", "POST", input)).status).toBe(401);
+    expect((await request("/staff/invitations", "POST", input, bearer)).status).toBe(403);
+    prisma.staffSession.findUnique
+      .mockResolvedValueOnce({ authVersion: 1, account: { ...admin, authVersion: 1 } })
+      .mockResolvedValueOnce(null);
+    expect((await request("/staff/invitations", "POST", input, bearer)).status).toBe(403);
+    expect(prisma.staffAccount.upsert).not.toHaveBeenCalled();
+  });
+
+  it("issues and reissues an audited expiring invitation without storing the plain code", async () => {
+    prisma.staffSession.findUnique.mockResolvedValue({
+      authVersion: 1,
+      account: { ...admin, authVersion: 1 },
+    });
+    prisma.staffAccount.upsert.mockResolvedValue({
+      id: "new-staff",
+      role: "EDITOR",
+      active: true,
+      authVersion: 0,
+      passwordHash: "",
+    });
+    const input = { email: " New-Staff@example.test ", role: "EDITOR" };
+    const first = await request("/staff/invitations", "POST", input, bearer);
+    const second = await request("/staff/invitations", "POST", input, bearer);
+    expect(first.status).toBe(201);
+    expect(second.status).toBe(201);
+    expect(second.headers.get("cache-control")).toBe("no-store");
+    const firstInvitation = await first.json();
+    const secondInvitation = await second.json();
+    expect(secondInvitation).toMatchObject({ email: "new-staff@example.test", role: "EDITOR" });
+    expect(secondInvitation.code).toMatch(/^[A-Za-z0-9_-]{43}$/);
+    expect(secondInvitation.code).not.toBe(firstInvitation.code);
+    expect(Date.parse(secondInvitation.expiresAt) - Date.now()).toBeGreaterThan(14 * 60 * 1000);
+    expect(prisma.staffChallenge.deleteMany).toHaveBeenCalledTimes(2);
+    expect(prisma.staffChallenge.deleteMany).toHaveBeenLastCalledWith({
+      where: { accountId: "new-staff", kind: "INVITE" },
+    });
+    expect(prisma.staffChallenge.create).toHaveBeenLastCalledWith({
+      data: {
+        tokenHash: createHash("sha256").update(secondInvitation.code).digest("hex"),
+        accountId: "new-staff",
+        kind: "INVITE",
+        authVersion: 0,
+        expiresAt: new Date(secondInvitation.expiresAt),
+      },
+    });
+    expect(prisma.studioAuditEvent.create).toHaveBeenLastCalledWith({
+      data: {
+        actorId: admin.id,
+        actor: admin.email,
+        resource: "STAFF",
+        resourceId: "new-staff",
+        title: "new-staff@example.test",
+        action: "INVITE_CODE_ISSUED",
+      },
+    });
+  });
+
+  it("rejects invalid roles and preserves existing accounts or pending roles", async () => {
+    prisma.staffSession.findUnique.mockResolvedValue({
+      authVersion: 1,
+      account: { ...admin, authVersion: 1 },
+    });
+    expect(
+      (await request("/staff/invitations", "POST", { email, role: "OWNER" }, bearer)).status,
+    ).toBe(400);
+    expect(prisma.staffAccount.upsert).not.toHaveBeenCalled();
+    prisma.staffAccount.upsert
+      .mockResolvedValueOnce({
+        ...editor,
+        active: true,
+        passwordHash: credentialHash,
+        authVersion: 1,
+      })
+      .mockResolvedValueOnce({ ...editor, active: true, passwordHash: "", authVersion: 1 });
+    expect(
+      (await request("/staff/invitations", "POST", { email, role: "EDITOR" }, bearer)).status,
+    ).toBe(409);
+    expect(
+      (await request("/staff/invitations", "POST", { email, role: "ADMIN" }, bearer)).status,
+    ).toBe(409);
+    expect(prisma.staffChallenge.create).not.toHaveBeenCalled();
   });
 
   it("rejects wrong credentials, disabled staff, and unknown staff with the same response", async () => {

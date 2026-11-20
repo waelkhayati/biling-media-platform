@@ -7,6 +7,8 @@ export type {
   StaffEpisodeInput,
   StaffEpisodeUpdate,
   StaffIdentity,
+  StaffInvitation,
+  StaffInviteInput,
   StaffListQuery,
   StaffLogin,
   StaffRecoveryInput,
@@ -22,6 +24,7 @@ export interface StaffAccessRow {
   role: "ADMIN" | "EDITOR";
   active: boolean;
   enrolled: boolean;
+  pendingInvitation?: boolean;
 }
 
 export interface StudioAuditRow {

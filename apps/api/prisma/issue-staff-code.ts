@@ -3,6 +3,7 @@ import { config as loadEnv } from "dotenv";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { staffEmailSchema, staffRoleSchema } from "@biling/schemas";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { issueStaffInvitation } from "../src/admin/staff-invitation";
 import {
   hashStaffToken,
   lockActiveStaff,
@@ -30,29 +31,23 @@ async function issue() {
   try {
     const token = newStaffToken();
     const created = await prisma.$transaction(async (tx) => {
+      if (kind === "INVITE") {
+        return issueStaffInvitation(
+          tx,
+          { email: email.data, role: role.data },
+          { email: "Operator CLI" },
+        );
+      }
       const select = { id: true, active: true, authVersion: true } as const;
-      const account =
-        kind === "INVITE"
-          ? await tx.staffAccount.upsert({
-              where: { email: email.data },
-              update: {},
-              create: {
-                email: email.data,
-                role: role.data,
-                passwordHash: pendingStaffPasswordHash,
-              },
-              select,
-            })
-          : await tx.staffAccount.findUnique({ where: { email: email.data }, select });
+      const account = await tx.staffAccount.findUnique({ where: { email: email.data }, select });
       if (!account?.active || !(await lockActiveStaff(tx, account.id, account.authVersion)))
         return false;
       const current = await tx.staffAccount.findUniqueOrThrow({
         where: { id: account.id },
-        select: { mfaSecret: true, passwordHash: true, role: true },
+        select: { mfaSecret: true, passwordHash: true },
       });
       const isPending = current.passwordHash === pendingStaffPasswordHash;
-      if (isPending !== (kind === "INVITE") || (kind === "INVITE" && current.role !== role.data))
-        return false;
+      if (isPending) return false;
       if (kind === "SETUP" && current.mfaSecret) return false;
       await tx.staffChallenge.deleteMany({
         where: {
@@ -82,7 +77,8 @@ async function issue() {
     });
     if (!created)
       return "Code unavailable. Check that the account is active and eligible for the selected purpose.";
-    process.stdout.write(`One-time ${kind.toLowerCase()} code (15 minutes): ${token}\n`);
+    const code = typeof created === "object" ? created.code : token;
+    process.stdout.write(`One-time ${kind.toLowerCase()} code (15 minutes): ${code}\n`);
   } catch {
     throw new Error("Could not issue a staff code. Check the database connection and migration.");
   } finally {
