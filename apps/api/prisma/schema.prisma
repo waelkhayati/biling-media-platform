@@ -104,6 +104,7 @@ model User {
   challenges       AudienceChallenge[]
   comments         CommunityComment[]
   commentReports   CommentReport[]
+  commentReactions CommentReaction[]
   articleReactions ArticleReaction[]
   episodeReactions EpisodeReaction[]
   followedShows    ShowFollow[]
@@ -263,6 +264,7 @@ model CommunityComment {
   body      String                 @db.VarChar(2000)
   status    CommunityCommentStatus @default(VISIBLE)
   reports   CommentReport[]
+  reactions CommentReaction[]
   createdAt DateTime               @default(now())
   updatedAt DateTime               @updatedAt
 
@@ -287,6 +289,18 @@ model CommentReport {
 
   @@unique([commentId, reporterId])
   @@index([status, createdAt, id])
+}
+
+model CommentReaction {
+  userId    String
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commentId String
+  comment   CommunityComment      @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  type      CommunityReactionType @default(LIKE)
+  createdAt DateTime              @default(now())
+
+  @@id([userId, commentId, type])
+  @@index([commentId, type])
 }
 
 model ArticleReaction {

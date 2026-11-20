@@ -1328,6 +1328,24 @@ button:focus-visible {
   padding-top: var(--space-3);
 }
 
+.nav-drawer-actions .audience-menu {
+  width: 100%;
+}
+
+.nav-drawer-actions .audience-menu summary {
+  justify-content: space-between;
+  min-height: 48px;
+  padding-inline: var(--space-2);
+}
+
+.nav-drawer-actions .audience-menu-panel {
+  position: static;
+  width: 100%;
+  margin-block: var(--space-1) 0;
+  padding: 0 var(--space-2);
+  border-color: var(--color-line);
+}
+
 .header-search {
   grid-column: 1 / -1;
   grid-row: 2;

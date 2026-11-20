@@ -1,0 +1,44 @@
+/* Final typography cascade. Feature styles may set layout and scale, but not hierarchy. */
+:root {
+  --type-level-one: var(--font-display);
+  --type-level-two: var(--font-navigation);
+  --type-level-three: var(--font-body);
+}
+
+/* Level 1: Biling's largest brand and page-statement moments. */
+.hero-title,
+.brand-lockup,
+.detail-title,
+.audience-panel-heading h1 {
+  font-family: var(--type-level-one);
+}
+
+/* Level 2: navigation and all editorial/section headings. */
+.main-nav a,
+.nav-drawer-links a,
+.section-title,
+.live-title,
+.community-title,
+.article-card h3,
+.article-heading h1,
+.studio .article-heading h1,
+.article-prose h2,
+.community-heading h2,
+.followed-show a,
+.studio :is(h1, h2) {
+  font-family: var(--type-level-two);
+  font-weight: 800;
+}
+
+/* Impact remains the mobile section voice, with the relaxed spacing set in globals.css. */
+@media (max-width: 767px) {
+  .section-title,
+  .live-title,
+  .community-title,
+  .community-heading h2 {
+    font-family: var(--type-level-one);
+    font-weight: 400;
+    letter-spacing: -0.012em;
+    line-height: 1.04;
+  }
+}

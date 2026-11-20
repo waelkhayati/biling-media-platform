@@ -61,6 +61,8 @@ export interface CommunityComment {
   createdAt: string;
   updatedAt: string;
   owned: boolean;
+  likeCount: number;
+  liked: boolean;
   author: CommunityAuthor;
   replies: CommunityComment[];
 }

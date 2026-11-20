@@ -126,6 +126,31 @@ export async function reportComment(
   return { success: "Report submitted for staff review." };
 }
 
+export async function toggleCommentLike(
+  path: string,
+  id: string,
+  value: boolean,
+  _state: CommunityState,
+): Promise<CommunityState> {
+  void _state;
+  if (!(await ready())) return originError;
+  if (!communityIdSchema.safeParse(id).success) return { error: "Invalid comment." };
+  const response = await communityRequest(
+    `/comments/${id}/likes`,
+    { method: value ? "PUT" : "DELETE" },
+    true,
+  ).catch(() => null);
+  if (response?.status === 401) return { error: "Sign in to react to comments." };
+  if (!response?.ok)
+    return {
+      error: response
+        ? await message(response, "Could not update your reaction.")
+        : "Reactions are temporarily unavailable.",
+    };
+  revalidatePath(path);
+  return {};
+}
+
 export async function toggleLike(
   path: string,
   value: boolean,

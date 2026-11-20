@@ -7,6 +7,7 @@ import {
   deleteComment,
   editComment,
   reportComment,
+  toggleCommentLike,
   toggleFollow,
   toggleLike,
   type CommunityState,
@@ -95,6 +96,40 @@ export function FollowControl({
   );
 }
 
+function CommentLikeControl({
+  path,
+  comment,
+  signedIn,
+}: {
+  path: string;
+  comment: CommunityComment;
+  signedIn: boolean;
+}) {
+  const [state, action, pending] = useActionState(
+    toggleCommentLike.bind(null, path, comment.id, !comment.liked),
+    initial,
+  );
+  return (
+    <div className="community-comment-reaction">
+      <form action={action}>
+        <button
+          className={comment.liked ? "community-button active" : "community-button"}
+          disabled={pending}
+          aria-pressed={comment.liked}
+        >
+          {comment.liked ? "Liked" : "Like"} <span>{comment.likeCount}</span>
+        </button>
+      </form>
+      {!signedIn && (
+        <a className="community-signin" href={`/login?returnTo=${encodeURIComponent(path)}`}>
+          Sign in to react
+        </a>
+      )}
+      <Feedback state={state} />
+    </div>
+  );
+}
+
 function CommentComposer({
   path,
   target,
@@ -173,6 +208,7 @@ function CommentItem({
         </div>
       </header>
       <p>{comment.body}</p>
+      <CommentLikeControl path={path} comment={comment} signedIn={signedIn} />
       {comment.owned ? (
         <details>
           <summary>Edit or delete</summary>

@@ -133,6 +133,20 @@
   color: #555;
   font-size: 0.82rem;
 }
+.community-comment-reaction {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+.community-comment-reaction .community-signin {
+  margin-top: 0;
+}
+.community-comment-reaction .community-feedback {
+  flex-basis: 100%;
+  margin: 0;
+}
 .community-avatar {
   display: grid;
   place-items: center;

@@ -16,6 +16,10 @@ const prisma = {
     updateMany: jest.fn(),
   },
   commentReport: { upsert: jest.fn(), updateMany: jest.fn() },
+  commentReaction: {
+    upsert: jest.fn(),
+    deleteMany: jest.fn(),
+  },
   articleReaction: {
     count: jest.fn(),
     findUnique: jest.fn(),
@@ -62,6 +66,8 @@ describe("CommunityService", () => {
         createdAt: now,
         updatedAt: now,
         user,
+        reactions: [{ userId: user.id }],
+        _count: { reactions: 1 },
         replies: [
           {
             id: "reply-1",
@@ -70,6 +76,8 @@ describe("CommunityService", () => {
             createdAt: now,
             updatedAt: now,
             user: { ...user, id: "user-2" },
+            reactions: [],
+            _count: { reactions: 0 },
           },
         ],
       },
@@ -81,6 +89,8 @@ describe("CommunityService", () => {
     expect(result.items[0]).toMatchObject({
       body: "Top level",
       owned: true,
+      liked: true,
+      likeCount: 1,
       replies: [{ body: "Reply", owned: false }],
     });
     expect(prisma.communityComment.findMany).toHaveBeenCalledWith(
@@ -128,6 +138,26 @@ describe("CommunityService", () => {
     expect(prisma.articleReaction.deleteMany).toHaveBeenCalledTimes(1);
     expect(prisma.showFollow.upsert).toHaveBeenCalledTimes(1);
     expect(prisma.showFollow.deleteMany).toHaveBeenCalledTimes(1);
+  });
+
+  it("only reacts to visible comments and stores comment likes idempotently", async () => {
+    prisma.communityComment.findFirst.mockResolvedValue({ id: "comment-1" });
+    await service.setCommentLike("comment-1", user.id, true);
+    await service.setCommentLike("comment-1", user.id, false);
+    expect(prisma.commentReaction.upsert).toHaveBeenCalledWith({
+      where: {
+        userId_commentId_type: { userId: user.id, commentId: "comment-1", type: "LIKE" },
+      },
+      create: { userId: user.id, commentId: "comment-1" },
+      update: {},
+    });
+    expect(prisma.commentReaction.deleteMany).toHaveBeenCalledWith({
+      where: { userId: user.id, commentId: "comment-1", type: "LIKE" },
+    });
+    prisma.communityComment.findFirst.mockResolvedValue(null);
+    await expect(service.setCommentLike("missing", user.id, true)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 
   it("records reports once per user and audits moderation in the same transaction", async () => {

@@ -72,13 +72,20 @@ export class CommunityService {
   async comments(query: CommentListQuery, userId?: string): Promise<CommunityCommentList> {
     const { sort, page, limit, ...targetInput } = query;
     const target = await this.target(targetInput as CommunityTarget);
+    const reactions = {
+      where: { userId: userId ?? "", type: "LIKE" as const },
+      select: { userId: true },
+    };
+    const reactionCount = { select: { reactions: { where: { type: "LIKE" as const } } } };
     const rows = await this.prisma.communityComment.findMany({
       where: { ...target, parentId: null, status: "VISIBLE" },
       include: {
         user: { select: author },
+        reactions,
+        _count: reactionCount,
         replies: {
           where: { status: "VISIBLE" },
-          include: { user: { select: author } },
+          include: { user: { select: author }, reactions, _count: reactionCount },
           orderBy: [{ createdAt: "asc" }, { id: "asc" }],
         },
       },
@@ -97,6 +104,8 @@ export class CommunityService {
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
       owned: row.userId === userId,
+      likeCount: row._count.reactions,
+      liked: row.reactions.length > 0,
       author: publicAuthor(row.user),
       replies: "replies" in row ? row.replies.map((reply) => serialize(reply)) : [],
     });
@@ -156,6 +165,24 @@ export class CommunityService {
       create: { commentId: id, reporterId: userId, ...input },
       update: { ...input, status: "OPEN" },
     });
+  }
+
+  async setCommentLike(id: string, userId: string, value: boolean) {
+    const comment = await this.prisma.communityComment.findFirst({
+      where: { id, status: "VISIBLE" },
+      select: { id: true },
+    });
+    if (!comment) throw new NotFoundException("Comment not found.");
+    if (value)
+      await this.prisma.commentReaction.upsert({
+        where: { userId_commentId_type: { userId, commentId: id, type: "LIKE" } },
+        create: { userId, commentId: id },
+        update: {},
+      });
+    else
+      await this.prisma.commentReaction.deleteMany({
+        where: { userId, commentId: id, type: "LIKE" },
+      });
   }
 
   async engagement(targetInput: CommunityTarget, userId?: string) {

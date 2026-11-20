@@ -104,6 +104,22 @@ export class CommunityController {
     );
   }
 
+  @Put("comments/:id/likes")
+  @ApiBearerAuth("audience")
+  @HttpCode(204)
+  async likeComment(@Param("id") id: string, @Req() request: Request) {
+    const viewer = await this.write(request, "comment-reaction");
+    await this.community.setCommentLike(validate(communityIdSchema, id), viewer.id, true);
+  }
+
+  @Delete("comments/:id/likes")
+  @ApiBearerAuth("audience")
+  @HttpCode(204)
+  async unlikeComment(@Param("id") id: string, @Req() request: Request) {
+    const viewer = await this.write(request, "comment-reaction");
+    await this.community.setCommentLike(validate(communityIdSchema, id), viewer.id, false);
+  }
+
   @Get("engagement")
   @Header("Cache-Control", "no-store")
   async engagement(@Query() query: unknown, @Req() request: Request) {

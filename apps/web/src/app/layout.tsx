@@ -7,6 +7,7 @@ import "./shows/detail.css";
 import "./discovery.css";
 import "./audience.css";
 import "./community.css";
+import "./typography.css";
 
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
