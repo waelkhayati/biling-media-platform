@@ -9,6 +9,7 @@ import { AdminModule } from "./admin/admin.module";
 import { ArticleModule } from "./articles/article.module";
 import { AudienceModule } from "./audience/audience.module";
 import { CommunityModule } from "./community/community.module";
+import { GameModule } from "./games/game.module";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CommunityModule } from "./community/community.module";
     ArticleModule,
     AudienceModule,
     CommunityModule,
+    GameModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }],
 })

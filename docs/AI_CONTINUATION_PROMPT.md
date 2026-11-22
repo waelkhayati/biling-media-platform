@@ -49,3 +49,7 @@ Run quality checks with `npx pnpm@10 run lint`, `typecheck`, `test`, and `build`
 Proceed incrementally: inspect → make a focused change → run the smallest relevant validation → report what changed and what remains. Preserve existing behavior, add/update directly relevant tests and documentation, and do not claim a command or deployment was verified unless it was actually checked. Respect user work in a dirty worktree. Ask one clear question if a material product or behavioral decision is genuinely ambiguous.
 
 The user prefers concise, step-by-step explanations. Keep updates brief, explain any necessary decisions, and do not continue unrelated implementation after completing the requested task.
+
+## Current Games Hub state
+
+Phase 8 Games Hub is local and undeployed. It has `TRIVIA`, `PERSONALITY`, and `DAILY_CHALLENGE` records, server-side scoring, UTC-based daily official attempt protection, public `/games` routes, and Studio `/admin/games` management. Its `20261120160000_games_hub` migration has been applied only to local PostgreSQL. Do not deploy or apply any of the Phase 6-8 migrations to production without explicit approval. The next practical follow-up is improving the Studio JSON authoring field into a visual question/outcome builder, then conducting an end-to-end browser test with approved game content.

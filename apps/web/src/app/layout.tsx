@@ -7,7 +7,10 @@ import "./shows/detail.css";
 import "./discovery.css";
 import "./audience.css";
 import "./community.css";
+import "./games.css";
 import "./typography.css";
+import "./legal.css";
+import { CookieConsent } from "@/components/cookie-consent";
 
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
@@ -22,7 +25,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>{children}<CookieConsent /></body>
     </html>
   );
 }

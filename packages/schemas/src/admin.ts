@@ -55,7 +55,7 @@ export const staffInvitationSchema = staffInviteInputSchema.extend({
 export type StaffInviteInput = z.infer<typeof staffInviteInputSchema>;
 export type StaffInvitation = z.infer<typeof staffInvitationSchema>;
 export const staffAuditQuerySchema = z.object({
-  kind: z.enum(["SHOW", "EPISODE", "ARTICLE", "STAFF"]).optional(),
+  kind: z.enum(["SHOW", "EPISODE", "ARTICLE", "GAME", "STAFF"]).optional(),
   page: z
     .string()
     .regex(/^[1-9][0-9]{0,4}$/)

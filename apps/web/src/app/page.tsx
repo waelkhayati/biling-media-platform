@@ -333,8 +333,12 @@ export default async function HomePage() {
         <nav className="footer-nav" aria-label="Footer navigation">
           <ContentLink href="/shows">Productions</ContentLink>
           <ContentLink href="/search">Search</ContentLink>
+          <ContentLink href="/games">Games</ContentLink>
           <a href="#live">Live</a>
           <a href="#people">People</a>
+          <ContentLink href="/privacy">Privacy</ContentLink>
+          <ContentLink href="/cookies">Cookies</ContentLink>
+          <ContentLink href="/terms">Terms</ContentLink>
         </nav>
         <small>© {new Date().getFullYear()} Biling Media · Official social links to be added</small>
       </footer>

@@ -40,6 +40,18 @@ export type {
   AudienceSession,
 } from "@biling/schemas";
 export type {
+  GameAttemptInput,
+  GameAttemptResult,
+  GameDetail,
+  GameInput,
+  GameList,
+  GameQuery,
+  GameSummary,
+  GameUpdate,
+  StudioGame,
+  StudioGameQuery,
+} from "@biling/schemas";
+export type {
   CommunityTarget,
   CommentCreate,
   CommentUpdate,

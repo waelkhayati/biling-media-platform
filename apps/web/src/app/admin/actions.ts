@@ -18,6 +18,9 @@ import {
   staffSessionSchema,
   moderationActionSchema,
   communityIdSchema,
+  gameInputSchema,
+  gameUpdateSchema,
+  studioGameSchema,
 } from "@biling/schemas";
 import type { StaffInvitation } from "@biling/contracts";
 import {
@@ -373,4 +376,43 @@ export async function saveStudioArticle(
   if (!savedId) redirect("/admin/login");
   revalidatePath("/admin/articles");
   redirect("/admin/articles/" + savedId + "?saved=1");
+}
+
+export async function saveStudioGame(
+  id: string | null,
+  _state: FormState,
+  form: FormData,
+): Promise<FormState> {
+  if (!(await sameStudioOrigin())) return { error: "Save from the configured Admin Studio address." };
+  if (id && !staffContentIdSchema.safeParse(id).success) return { error: "Invalid game." };
+  let questions: unknown;
+  let outcomes: unknown;
+  try {
+    questions = JSON.parse(String(form.get("questions") ?? ""));
+    outcomes = JSON.parse(String(form.get("outcomes") ?? ""));
+  } catch {
+    return { error: "Questions and outcomes must contain valid JSON." };
+  }
+  const utcDate = (name: string) => {
+    const value = nullable(form, name);
+    return value ? `${value}${value.length === 16 ? ":00" : ""}Z` : null;
+  };
+  const input = {
+    title: form.get("title"), slug: form.get("slug"), description: nullable(form, "description"),
+    artworkUrl: nullable(form, "artworkUrl"), type: form.get("type"), featured: form.get("featured") === "on",
+    status: form.get("status"), availableFrom: utcDate("availableFrom"), availableUntil: utcDate("availableUntil"),
+    timeLimitSeconds: numberField(form, "timeLimitSeconds"), questions, outcomes,
+  };
+  const parsed = id ? gameUpdateSchema.safeParse({ ...input, revision: form.get("revision") }) : gameInputSchema.safeParse(input);
+  if (!parsed.success) return { error: parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join(" ") };
+  try {
+    const response = await studioRequest(id ? "/games/" + id : "/games", { method: id ? "PATCH" : "POST", body: JSON.stringify(parsed.data) });
+    if (!response.ok) return { error: await apiMessage(response, "Could not save the game.") };
+    const saved = studioGameSchema.parse(await response.json());
+    revalidatePath("/admin/games");
+    revalidatePath("/games");
+    redirect(`/admin/games/${saved.id}?saved=1`);
+  } catch {
+    return { error: "Could not confirm the save. Check the games list before retrying." };
+  }
 }

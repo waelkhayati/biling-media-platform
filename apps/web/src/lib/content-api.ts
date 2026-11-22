@@ -4,6 +4,8 @@ import {
   articleDetailSchema,
   articleListSchema,
   articleSitemapSchema,
+  gameDetailSchema,
+  gameListSchema,
   contentSearchResultsSchema,
   contentSlugSchema,
   publishedEpisodeDetailSchema,
@@ -93,4 +95,16 @@ export async function getArticle(slug: string) {
 
 export async function getArticleSitemap() {
   return articleSitemapSchema.parse(await fetchApi("/articles/sitemap"));
+}
+
+export async function getGames(filters: { page?: number; type?: string; featured?: "true" } = {}) {
+  const params = new URLSearchParams();
+  for (const [name, value] of Object.entries(filters)) if (value !== undefined) params.set(name, String(value));
+  return gameListSchema.parse(await fetchApi("/games" + (params.size ? "?" + params : "")));
+}
+
+export async function getGame(slug: string) {
+  if (!contentSlugSchema.safeParse(slug).success) return null;
+  const data = await fetchApi("/games/" + encodeURIComponent(slug), true);
+  return data === notFound ? null : gameDetailSchema.parse(data);
 }

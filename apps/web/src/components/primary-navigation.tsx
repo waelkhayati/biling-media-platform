@@ -44,6 +44,9 @@ export function PrimaryNavigation({ home, actions }: PrimaryNavigationProps) {
       <ContentLink href="/articles" onClick={inDrawer ? () => setOpen(false) : undefined}>
         Articles
       </ContentLink>
+      <ContentLink href="/games" onClick={inDrawer ? () => setOpen(false) : undefined}>
+        Games
+      </ContentLink>
       <a href={`${home}#episodes`} onClick={inDrawer ? () => setOpen(false) : undefined}>
         Episodes
       </a>

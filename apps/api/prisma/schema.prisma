@@ -108,6 +108,7 @@ model User {
   articleReactions ArticleReaction[]
   episodeReactions EpisodeReaction[]
   followedShows    ShowFollow[]
+  gameAttempts     GameAttempt[]
 }
 
 enum AudienceChallengeKind {
@@ -349,4 +350,88 @@ model CommunityModerationEvent {
 
   @@index([commentId, createdAt, id])
   @@index([createdAt, id])
+}
+
+enum GameType {
+  TRIVIA
+  PERSONALITY
+  DAILY_CHALLENGE
+}
+
+model Game {
+  id                String        @id @default(cuid())
+  slug              String        @unique
+  title             String
+  description       String?       @db.Text
+  artworkUrl        String?
+  type              GameType
+  featured          Boolean       @default(false)
+  status            ContentStatus @default(DRAFT)
+  availableFrom     DateTime?
+  availableUntil    DateTime?
+  timeLimitSeconds  Int?
+  questions         GameQuestion[]
+  outcomes          GameOutcome[]
+  attempts          GameAttempt[]
+  firstPublishedAt  DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([status, type, createdAt])
+  @@index([status, featured, createdAt])
+}
+
+model GameQuestion {
+  id          String       @id @default(cuid())
+  gameId      String
+  game        Game         @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  position    Int
+  prompt      String       @db.VarChar(1000)
+  explanation String?      @db.VarChar(2000)
+  options     GameOption[]
+
+  @@unique([gameId, position])
+}
+
+model GameOption {
+  id          String       @id @default(cuid())
+  questionId  String
+  question    GameQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  position    Int
+  text        String       @db.VarChar(500)
+  correct     Boolean      @default(false)
+  outcomeKey  String?      @db.VarChar(80)
+
+  @@unique([questionId, position])
+}
+
+model GameOutcome {
+  id          String @id @default(cuid())
+  gameId      String
+  game        Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  key         String @db.VarChar(80)
+  title       String @db.VarChar(160)
+  description String @db.VarChar(2000)
+  imageUrl    String?
+
+  @@unique([gameId, key])
+}
+
+model GameAttempt {
+  id                String   @id @default(cuid())
+  gameId            String
+  game              Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  official          Boolean  @default(false)
+  dailyDate         String?  @db.VarChar(10)
+  score             Int
+  totalQuestions    Int
+  outcomeKey        String?  @db.VarChar(80)
+  answers           Json
+  completedAt       DateTime @default(now())
+
+  @@unique([gameId, userId, dailyDate])
+  @@index([userId, completedAt])
+  @@index([gameId, official, completedAt])
 }

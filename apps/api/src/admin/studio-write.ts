@@ -34,7 +34,7 @@ export async function writeStudioChange<
 >(
   prisma: PrismaService,
   actor: StaffIdentity,
-  resource: "SHOW" | "EPISODE" | "ARTICLE",
+  resource: "SHOW" | "EPISODE" | "ARTICLE" | "GAME",
   previousStatus: Show["status"] | null,
   mutation: (tx: Prisma.TransactionClient) => Promise<T>,
 ) {
