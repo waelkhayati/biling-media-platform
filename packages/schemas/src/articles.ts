@@ -24,11 +24,24 @@ export const articleBlockSchema = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("youtube"), videoId: youtubeVideoIdSchema }),
 ]);
 export const articleBodyMaxBytes = 50_000;
+
+function articleBodyBytes(blocks: unknown) {
+  let bytes = 0;
+  for (const character of JSON.stringify(blocks)) {
+    const unit = character.charCodeAt(0);
+    if (unit < 0x80) bytes += 1;
+    else if (unit < 0x800) bytes += 2;
+    else bytes += character.length === 2 ? 4 : 3;
+    if (bytes > articleBodyMaxBytes) break;
+  }
+  return bytes;
+}
+
 export const articleBodySchema = z
   .array(articleBlockSchema)
   .max(100)
   .refine(
-    (blocks) => new TextEncoder().encode(JSON.stringify(blocks)).length <= articleBodyMaxBytes,
+    (blocks) => articleBodyBytes(blocks) <= articleBodyMaxBytes,
     "Article body is too long.",
   );
 const fields = {

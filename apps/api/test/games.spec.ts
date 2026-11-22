@@ -1,7 +1,7 @@
 import { ConflictException, ForbiddenException } from "@nestjs/common";
 import { GameService } from "../src/games/game.service";
 
-const prisma = { game: { findFirst: jest.fn() }, gameAttempt: { create: jest.fn() } };
+const prisma = { game: { findFirst: jest.fn(), findMany: jest.fn() }, gameAttempt: { create: jest.fn() }, dailyQuizProgress: { findUnique: jest.fn() } };
 const trivia = {
   id: "game-1", slug: "trivia", type: "TRIVIA", outcomes: [],
   questions: [{ id: "q-1", position: 0, prompt: "Question", explanation: "Because.", options: [{ id: "wrong", text: "Wrong", correct: false, outcomeKey: null }, { id: "right", text: "Right", correct: true, outcomeKey: null }] }],
@@ -10,6 +10,17 @@ const trivia = {
 describe("GameService", () => {
   const service = new GameService(prisma as never);
   beforeEach(() => jest.resetAllMocks());
+
+  it("scopes paginated text search to active published games and treats wildcards literally", async () => {
+    prisma.game.findMany.mockResolvedValue([]);
+    await expect(service.list({ page: 2, q: "100%" })).resolves.toMatchObject({ items: [], page: 2, hasMore: false });
+    const pattern = { contains: "100\\%", mode: "insensitive" };
+    expect(prisma.game.findMany).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      skip: 12,
+      take: 13,
+      where: expect.objectContaining({ status: "PUBLISHED", AND: expect.any(Array), OR: [{ title: pattern }, { description: pattern }] }),
+    }));
+  });
 
   it("scores trivia on the server and only exposes answers after submission", async () => {
     prisma.game.findFirst.mockResolvedValue(trivia);

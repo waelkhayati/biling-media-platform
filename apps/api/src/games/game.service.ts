@@ -9,17 +9,20 @@ import {
 import type { StaffIdentity } from "@biling/contracts";
 import {
   gameAttemptResultSchema,
+  dailyQuizMoveSchema,
   gameDetailSchema,
   gameListSchema,
   gameSummarySchema,
   studioGameSchema,
   type GameAttemptInput,
+  type DailyQuizMove,
   type GameInput,
   type GameQuery,
   type GameUpdate,
   type StudioGameQuery,
 } from "@biling/schemas";
 import { authorizeStatus, writeStudioChange } from "../admin/studio-write";
+import { matchContentText } from "../common/content-match";
 import { PrismaService } from "../database/prisma.service";
 import type { Prisma } from "../generated/prisma/client";
 
@@ -79,8 +82,8 @@ function duplicate(error: unknown) {
 export class GameService {
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
-  async list({ page, type, featured }: GameQuery) {
-    const where = { ...active(), type, featured: featured ? true : undefined };
+  async list({ page, type, featured, q }: GameQuery) {
+    const where = { ...active(), type, featured: featured ? true : undefined, OR: q ? matchContentText(q) : undefined };
     const [rows, types] = await Promise.all([
       this.prisma.game.findMany({ where, select: gameSelect, orderBy: [{ featured: "desc" }, { createdAt: "desc" }, { id: "desc" }], take: 13, skip: (page - 1) * 12 }),
       this.prisma.game.findMany({ where: active(), select: { type: true }, distinct: ["type"] }),
@@ -95,6 +98,43 @@ export class GameService {
     });
     if (!row) throw new NotFoundException("Game not found.");
     return gameDetailSchema.parse({ ...summary(row), questions: row.questions });
+  }
+
+  async dailyProgress(slug: string, userId: string, move?: DailyQuizMove) {
+    const date = utcDate();
+    const game = await this.prisma.game.findFirst({
+      where: { slug, ...active(), type: "DAILY_CHALLENGE" },
+      select: { id: true, updatedAt: true, questions: { select: { id: true, options: { select: { id: true } } } } },
+    });
+    if (!game) throw new NotFoundException("Daily challenge unavailable.");
+    if (move && !game.questions.some((question) => question.id === move.questionId && question.options.some((option) => option.id === move.optionId)))
+      throw new BadRequestException("That answer is unavailable.");
+
+    const key = { gameId: game.id, userId, date };
+    const where = { gameId_userId_date: key };
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const [completed, draft] = await Promise.all([
+        this.prisma.gameAttempt.findFirst({ where: { gameId: game.id, userId, dailyDate: date, official: true }, select: { answers: true } }),
+        this.prisma.dailyQuizProgress.findUnique({ where }),
+      ]);
+      if (completed) return { answers: dailyQuizMoveSchema.array().parse(completed.answers), completed: true };
+      const answers = draft?.gameRevision.getTime() === game.updatedAt.getTime() ? dailyQuizMoveSchema.array().parse(draft.answers) : [];
+      if (!move) return { answers, completed: false };
+      const next = [...answers.filter((answer) => answer.questionId !== move.questionId), move];
+      if (draft) {
+        const saved = await this.prisma.dailyQuizProgress.updateMany({
+          where: { ...key, revision: draft.revision },
+          data: { revision: { increment: 1 }, answers: next, gameRevision: game.updatedAt },
+        });
+        if (saved.count) return { answers: next, completed: false };
+      } else {
+        try {
+          await this.prisma.dailyQuizProgress.create({ data: { ...key, gameRevision: game.updatedAt, answers: next } });
+          return { answers: next, completed: false };
+        } catch (error) { if (!duplicate(error)) throw error; }
+      }
+    }
+    throw new ConflictException("Your answers changed on another device. Reload and try again.");
   }
 
   async attempt(slug: string, input: GameAttemptInput, userId?: string) {
@@ -114,6 +154,17 @@ export class GameService {
     });
     const official = row.type === "DAILY_CHALLENGE" && !input.practice;
     if (official && !userId) throw new ForbiddenException("Sign in to record today’s official challenge score.");
+    const date = official ? utcDate() : null;
+    if (date && userId) {
+      const draft = await this.prisma.dailyQuizProgress.findUnique({
+        where: { gameId_userId_date: { gameId: row.id, userId, date } },
+      });
+      if (draft) {
+        const saved = dailyQuizMoveSchema.array().parse(draft.answers);
+        if (draft.gameRevision.getTime() !== row.updatedAt.getTime() || saved.length !== answers.size || saved.some((answer) => answers.get(answer.questionId) !== answer.optionId))
+          throw new ConflictException("Your saved answers changed. Reload the challenge and try again.");
+      }
+    }
     const score = row.type === "PERSONALITY" ? 0 : selected.filter(({ option }) => option.correct).length;
     let outcome = null;
     if (row.type === "PERSONALITY") {
@@ -121,7 +172,6 @@ export class GameService {
       for (const { option } of selected) totals.set(option.outcomeKey!, (totals.get(option.outcomeKey!) ?? 0) + 1);
       outcome = [...row.outcomes].sort((a, b) => ((totals.get(b.key) ?? 0) - (totals.get(a.key) ?? 0)) || a.key.localeCompare(b.key))[0] ?? null;
     }
-    const date = official ? utcDate() : null;
     try {
       if (userId) await this.prisma.gameAttempt.create({
         data: {

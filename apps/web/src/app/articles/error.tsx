@@ -6,7 +6,7 @@ import { SiteHeaderFrame } from "@/components/site-header-frame";
 export default function ArticlesError() {
   return (
     <>
-      <SiteHeaderFrame onDiscovery={false} />
+      <SiteHeaderFrame />
       <main className="detail-main">
         <ContentError />
       </main>

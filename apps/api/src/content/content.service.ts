@@ -20,6 +20,7 @@ import type { Episode, Prisma, Show } from "../generated/prisma/client";
 import { PrismaService } from "../database/prisma.service";
 
 import { searchArticles } from "../articles/article.service";
+import { matchContentText } from "../common/content-match";
 
 const publishedEpisodeFilter = {
   status: "PUBLISHED",
@@ -31,12 +32,6 @@ const newestEpisodes = [
   { createdAt: "desc" },
   { id: "desc" },
 ] satisfies Prisma.EpisodeOrderByWithRelationInput[];
-
-function matchContentText(query: string) {
-  // Prisma maps contains to SQL LIKE/ILIKE. Treat its wildcard characters as literal text.
-  const pattern = { contains: query.replace(/[\\%_]/g, "\\$&"), mode: "insensitive" } as const;
-  return [{ title: pattern }, { description: pattern }];
-}
 
 @Injectable()
 export class ContentService {

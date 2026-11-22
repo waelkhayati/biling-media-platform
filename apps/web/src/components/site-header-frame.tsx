@@ -3,22 +3,14 @@ import { BrandLogo } from "./brand-logo";
 import { DiscoveryForm } from "./discovery-form";
 import { PrimaryNavigation } from "./primary-navigation";
 
-export function SiteHeaderFrame({
-  onDiscovery = true,
-  account,
-}: {
-  onDiscovery?: boolean;
-  account?: ReactNode;
-}) {
-  const home = onDiscovery ? "" : "/";
-
+export function SiteHeaderFrame({ account }: { account?: ReactNode }) {
   return (
     <header className="site-header page-gutter">
-      <a className="brand-lockup" href={`${home}#top`} aria-label="Biling Media home">
+      <a className="brand-lockup" href="/#top" aria-label="Biling Media home">
         <BrandLogo />
         <span className="brand-wordmark">Biling</span>
       </a>
-      <PrimaryNavigation home={home} actions={account} />
+      <PrimaryNavigation actions={account} />
       <DiscoveryForm
         action="/search"
         className="header-search"
@@ -28,7 +20,7 @@ export function SiteHeaderFrame({
       <div className="header-actions">
         <a
           className="live-link header-live"
-          href={`${home}#live`}
+          href="/#live"
           aria-label="Live broadcasts, currently off air"
         >
           <span className="live-dot" aria-hidden="true" />

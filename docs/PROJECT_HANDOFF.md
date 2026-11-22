@@ -16,7 +16,7 @@ The long-term vision includes:
 - Search, recommendations, and content discovery.
 - An administrative content-management and moderation interface.
 - Premium subscriptions, advertising and sponsorship, merchandise, events and ticketing, giveaways, games, loyalty points, rewards, and potentially carrier billing.
-- A future native mobile application built with React Native and Expo.
+- A native mobile application built with React Native and Expo.
 
 ### MVP actually implemented
 
@@ -202,7 +202,7 @@ Search and directory text filters accept 2–100 characters. NestJS validates th
 - `@biling/schemas` (`packages/schemas`) provides Zod schemas for show status, show inputs, YouTube video IDs, published shows, and published episodes, plus inferred TS types.
 - `@biling/config` (`packages/config`) currently packages only the shared base TypeScript configuration; it is not a runtime application settings package.
 
-These contracts and schemas are used by both the API and web, but no React Native compatibility has been tested. Keep future shared modules free of web-only APIs and do not share web UI components with a native app by default.
+The API, web and native app use these contracts and schemas. Keep shared modules free of platform-specific UI and APIs.
 
 ## 6. Database and content
 
@@ -526,7 +526,7 @@ Next.js sends bearer tokens to NestJS server-to-server. The browser stores only 
 
 Email links place tokens in URL fragments so ordinary HTTP requests and referrers omit them. The web form removes the fragment from history after loading it. Verification requires the signup password as well as the email token. Recovery responses intentionally avoid confirming registered email addresses. A disposable PostgreSQL smoke run preserved a legacy user and exercised verification and reset through a stubbed Resend transport. Real inbox delivery still needs configured credentials and a verified sender. Workspace lint, typecheck, tests, and build passed. A 390px-wide Edge run verified signup, sign-in, the HttpOnly cookie, the account menu, profile editing and sign-out. The migration was applied to the local preview on port 3100.
 
-Public profile URLs, account deletion, and the native app remain future work. Phase 6 has not been deployed and its migration has not been applied to production.
+Public profile URLs and account deletion remain future work. Phase 6 has not been deployed and its migration has not been applied to production.
 
 ## 17. Community engagement
 
@@ -549,3 +549,13 @@ Public routes are `/games` and `/games/[slug]`. Published games must be within t
 Admin Studio adds `/admin/games` and `/admin/games/[id]`, backed by `GET/POST/PATCH /api/v1/admin/games`. ADMIN and EDITOR may create/update drafts or published games; only ADMIN can archive or edit archived content. The MVP editor accepts question/outcome JSON, validates trivia/daily correct answers and personality outcome keys, and exposes attempt totals. No games are seeded because Biling-approved questions and artwork were not supplied.
 
 The focused Games service tests cover server-side trivia scoring, personality outcomes, daily authentication, and duplicate official attempt prevention. Time-limit configuration is displayed but is not yet enforced with a server-issued start token. Leaderboards, rewards, contests, sponsorship, payments, and prizes are deliberately out of scope. No production migration or deployment was performed.
+
+## 19. Native mobile application
+
+The Expo Router application in `apps/mobile` implements Home, Explore, Games, Following and Profile with native React Native screens for productions, episodes, articles and gameplay. It reuses published REST routes and shared schemas. The existing audience bearer is stored in SecureStore, and official games and community writes are validated by NestJS. Hosting and local device setup are in [Mobile development](MOBILE_DEVELOPMENT.md).
+
+Mobile release readiness requires device tests on both iOS and Android. Confirm YouTube player identity and fullscreen, session persistence and expiry, official daily attempts, safe areas, keyboard avoidance, large text and Arabic article layout. Games and community depend on the target API revision and database migrations. Verification and password recovery use the existing website email links.
+
+## 20. Biling Arcade
+
+The web and native Games hubs include daily Mot, Links and Recall boards alongside the quiz collection. The API owns puzzle definitions, attempt timing, move validation and persisted account progress. The Studio Arcade editor schedules immutable daily puzzles by UTC date. Official legacy daily quiz selections are persisted, while casual quizzes reset when leaving the player. See [Arcade development](ARCADE_DEVELOPMENT.md) for migrations, local sample content, endpoints and the device checklist.

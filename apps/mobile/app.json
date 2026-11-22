@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "Biling Media",
+    "slug": "biling-media",
+    "scheme": "biling",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "platforms": ["ios", "android"],
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        { "backgroundColor": "#FF4B0B", "image": "./assets/logo.png", "imageWidth": 124 }
+      ]
+    ],
+    "ios": {
+      "bundleIdentifier": "com.bilingmedia.app"
+    },
+    "android": {
+      "package": "com.bilingmedia.app"
+    },
+    "extra": {
+      "supportsRTL": true
+    }
+  }
+}

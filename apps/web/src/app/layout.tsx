@@ -8,6 +8,7 @@ import "./discovery.css";
 import "./audience.css";
 import "./community.css";
 import "./games.css";
+import "./arcade.css";
 import "./typography.css";
 import "./legal.css";
 import { CookieConsent } from "@/components/cookie-consent";

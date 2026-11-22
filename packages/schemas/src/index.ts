@@ -1,13 +1,21 @@
 import { z } from "zod";
 import { articleSummarySchema } from "./articles.js";
 export * from "./articles.js";
-import { contentSlugSchema, showStatusSchema, youtubeVideoIdSchema } from "./content-fields.js";
+export { articleInline } from "./article-inline.js";
+import {
+  contentQuerySchema,
+  contentSlugSchema,
+  showStatusSchema,
+  youtubeVideoIdSchema,
+} from "./content-fields.js";
 
-export { contentSlugSchema, showStatusSchema, youtubeVideoIdSchema };
+export * from "./content-fields.js";
 export * from "./admin.js";
 export * from "./audience.js";
 export * from "./community.js";
 export * from "./games.js";
+export * from "./arcade.js";
+export * from "./quiz-selection.js";
 
 export const createShowSchema = z.object({
   title: z.string().trim().min(1).max(120),
@@ -61,15 +69,6 @@ export const publishedEpisodeDetailSchema = z.object({
   show: publishedShowIdentitySchema,
   relatedEpisodes: z.array(publishedEpisodeSchema),
 });
-
-export const contentQueryMinLength = 2;
-export const contentQueryMaxLength = 100;
-export const contentQuerySchema = z
-  .string()
-  .max(contentQueryMaxLength)
-  .trim()
-  .min(contentQueryMinLength)
-  .refine((value) => !value.includes("\0"), { message: "Invalid search text" });
 
 const contentResultLimitSchema = z
   .string()

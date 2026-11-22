@@ -12,7 +12,7 @@ export default function AudienceLayout({ children }: { children: ReactNode }) {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <SiteHeader onDiscovery={false} />
+      <SiteHeader />
       <main className="audience-main page-gutter" id="main">
         {children}
       </main>

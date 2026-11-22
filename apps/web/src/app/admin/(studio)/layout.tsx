@@ -23,6 +23,7 @@ export default async function StudioLayout({ children }: { children: ReactNode }
           <Link href="/admin/episodes">Episodes</Link>
           <Link href="/admin/articles">Articles</Link>
           <Link href="/admin/games">Games</Link>
+          <Link href="/admin/arcade">Arcade</Link>
           <Link href="/admin/community">Moderation</Link>
           <Link href="/admin/audit">Activity</Link>
           {account.role === "ADMIN" && <Link href="/admin/staff">Staff</Link>}

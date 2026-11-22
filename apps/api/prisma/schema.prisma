@@ -90,6 +90,8 @@ model StaffLoginThrottle {
 }
 
 model User {
+  arcadeRuns ArcadeRun[]
+  dailyQuizProgress DailyQuizProgress[]
   id               String              @id @default(cuid())
   email            String              @unique
   username         String?             @unique
@@ -373,6 +375,7 @@ model Game {
   questions         GameQuestion[]
   outcomes          GameOutcome[]
   attempts          GameAttempt[]
+  dailyProgress     DailyQuizProgress[]
   firstPublishedAt  DateTime?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
@@ -434,4 +437,53 @@ model GameAttempt {
   @@unique([gameId, userId, dailyDate])
   @@index([userId, completedAt])
   @@index([gameId, official, completedAt])
+}
+
+enum ArcadeKind {
+  MOT
+  LINKS
+  RECALL
+}
+
+model ArcadePuzzle {
+  id          String     @id @default(cuid())
+  slug        String
+  title       String
+  description String
+  date        String
+  kind        ArcadeKind
+  published   Boolean    @default(false)
+  definition  Json
+  runs        ArcadeRun[]
+
+  @@unique([slug, date])
+  @@index([date, published])
+}
+
+model ArcadeRun {
+  id        String       @id @default(cuid())
+  puzzleId  String
+  puzzle    ArcadePuzzle @relation(fields: [puzzleId], references: [id], onDelete: Restrict)
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deadline  DateTime
+  revision  Int          @default(0)
+  progress  Json
+
+  @@unique([puzzleId, userId])
+  @@index([userId])
+}
+
+model DailyQuizProgress {
+  gameId       String
+  game         Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date         String
+  gameRevision DateTime
+  revision     Int      @default(0)
+  answers      Json
+
+  @@id([gameId, userId, date])
+  @@index([userId])
 }

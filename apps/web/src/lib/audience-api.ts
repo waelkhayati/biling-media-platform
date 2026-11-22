@@ -96,13 +96,13 @@ export async function communityRequest(
   });
 }
 
-export async function gamesRequest(path: string, init: RequestInit = {}) {
+export async function gamesRequest(path: string, init: RequestInit = {}, area: "games" | "arcade" = "games") {
   const base = new URL(process.env.API_BASE_URL ?? "http://127.0.0.1:3001/api/v1");
   const requestHeaders = new Headers(init.headers);
   if (init.body) requestHeaders.set("Content-Type", "application/json");
   const token = audienceTokenSchema.safeParse((await cookies()).get(settings().cookie)?.value);
   if (token.success) requestHeaders.set("Authorization", "Bearer " + token.data);
-  return fetch(base.href.replace(/\/$/, "") + "/games" + path, {
+  return fetch(base.href.replace(/\/$/, "") + "/" + area + path, {
     ...init, headers: requestHeaders, cache: "no-store", redirect: "error", signal: AbortSignal.timeout(10_000),
   });
 }

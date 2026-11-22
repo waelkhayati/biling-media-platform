@@ -44,7 +44,7 @@ export default async function ArticlesPage({ searchParams }: Props) {
       <a href="#main" className="skip-link">
         Skip to content
       </a>
-      <SiteHeader onDiscovery={false} />
+      <SiteHeader />
       <main id="main" className="detail-main">
         <header className="catalog-masthead article-masthead page-gutter">
           <h1 className="detail-title">Articles.</h1>

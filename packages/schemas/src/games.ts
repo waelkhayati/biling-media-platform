@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { staffArtworkUrlSchema, staffContentIdSchema, staffListQuerySchema } from "./admin.js";
-import { contentSlugSchema, showStatusSchema } from "./content-fields.js";
+import { contentQuerySchema, contentSlugSchema, showStatusSchema } from "./content-fields.js";
 
 export const gameTypeSchema = z.enum(["TRIVIA", "PERSONALITY", "DAILY_CHALLENGE"]);
 const optionalText = (limit: number) => z.string().trim().min(1).max(limit).nullable();
@@ -95,6 +95,13 @@ export const gameAttemptInputSchema = z.strictObject({
   answers: z.array(z.strictObject({ questionId: staffContentIdSchema, optionId: staffContentIdSchema })).min(1).max(30),
   practice: z.boolean().default(false),
 });
+export const dailyQuizMoveSchema = gameAttemptInputSchema.shape.answers.element;
+export const dailyQuizProgressSchema = z.object({
+  answers: z.array(dailyQuizMoveSchema),
+  completed: z.boolean(),
+});
+export type DailyQuizMove = z.infer<typeof dailyQuizMoveSchema>;
+export type DailyQuizProgress = z.infer<typeof dailyQuizProgressSchema>;
 export const gameAttemptResultSchema = z.object({
   score: z.number().int().nonnegative(),
   totalQuestions: z.number().int().positive(),
@@ -103,7 +110,11 @@ export const gameAttemptResultSchema = z.object({
   outcome: z.object({ key: z.string(), title: z.string(), description: z.string(), imageUrl: z.string().url().nullable() }).nullable(),
   answers: z.array(z.object({ questionId: staffContentIdSchema, correctOptionId: staffContentIdSchema.nullable(), explanation: z.string().nullable() })),
 });
-export const gameQuerySchema = staffListQuerySchema.pick({ page: true }).extend({ type: gameTypeSchema.optional(), featured: z.literal("true").optional() });
+export const gameQuerySchema = staffListQuerySchema.pick({ page: true }).extend({
+  type: gameTypeSchema.optional(),
+  featured: z.literal("true").optional(),
+  q: contentQuerySchema.optional(),
+});
 export const studioGameQuerySchema = staffListQuerySchema.pick({ page: true, status: true }).extend({ type: gameTypeSchema.optional() });
 export const studioGameSchema = gameInputSchema.extend({ id: staffContentIdSchema, createdAt: z.iso.datetime(), updatedAt: z.iso.datetime(), firstPublishedAt: z.iso.datetime().nullable() });
 export type GameInput = z.infer<typeof gameInputSchema>;

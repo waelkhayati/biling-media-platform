@@ -12,10 +12,10 @@ You are continuing development of **Biling Media**, an original Tunisian enterta
 
 - This is a pnpm 10.34.9/Turborepo monorepo: `apps/web` is Next.js App Router + React + TypeScript; `apps/api` is a NestJS REST API; PostgreSQL and Prisma persist data; `packages/contracts`, `packages/schemas`, and `packages/config` contain shared contracts, Zod schemas, and TypeScript configuration.
 - Keep backend business logic and API contracts independent of Next.js so a future React Native + Expo client can use the same backend, data models, and business rules.
-- Share genuinely client-neutral contracts, schemas, brand assets, or tokens where useful - not web React components. The native app is future work and must not be created now.
+- Share client-neutral contracts, schemas, brand assets or tokens where useful. Keep the native and web React components separate.
 - The website should remain responsive and preserve its desktop experience. Do not simply shrink it to imitate a native app; consider touch targets, accessible focus, small-screen layout, and avoid essential hover-only interactions.
 - Preserve the Biling visual identity: “In art we trust,” orange `#ff4b0b`, near-black `#090909`, lime `#c8ff00`, paper `#f5f0e6`, bold editorial display type, and the supplied logo used unchanged. The current logo lockup has padding and an orange background, with no black border. Use labeled placeholders until Biling-approved, rights-cleared assets are supplied.
-- The current repository includes show and episode pages, discovery and grouped search, staff authentication with MFA and recovery, Admin Studio, and editorial publishing with structured article blocks. Verify the deployed revision separately from the working tree. Phase 6 adds audience registration, authentication, email verification and recovery, and private profiles locally. Phase 7 adds comments, reports, likes, show follows, and staff moderation locally. Staff and audience credentials and permissions remain separate. The native app remains future work.
+- The current repository includes show and episode pages, discovery and grouped search, staff authentication with MFA and recovery, Admin Studio, and editorial publishing with structured article blocks. Verify the deployed revision separately from the working tree. Phase 6 adds audience registration, authentication, email verification and recovery, and private profiles locally. Phase 7 adds comments, reports, likes, show follows, and staff moderation locally. Staff and audience credentials and permissions remain separate. The native app lives in apps/mobile.
 - Do not redesign the established architecture or add speculative microservices, Redis/BullMQ, billing, or broad abstractions.
 
 ## Where development stopped
@@ -53,3 +53,11 @@ The user prefers concise, step-by-step explanations. Keep updates brief, explain
 ## Current Games Hub state
 
 Phase 8 Games Hub is local and undeployed. It has `TRIVIA`, `PERSONALITY`, and `DAILY_CHALLENGE` records, server-side scoring, UTC-based daily official attempt protection, public `/games` routes, and Studio `/admin/games` management. Its `20261120160000_games_hub` migration has been applied only to local PostgreSQL. Do not deploy or apply any of the Phase 6-8 migrations to production without explicit approval. The next practical follow-up is improving the Studio JSON authoring field into a visual question/outcome builder, then conducting an end-to-end browser test with approved game content.
+
+## Native mobile
+
+The native app is implemented in `apps/mobile`. Read [Mobile development](MOBILE_DEVELOPMENT.md) before changing or testing it. Reuse the public NestJS endpoints and workspace contracts. The app uses SecureStore for the existing audience bearer and preserves server-side game scoring and eligibility. The mobile device checklist covers playback, sessions, navigation, articles, games, community interactions and accessibility. Treat device execution and the deployed API capabilities as separate verification requirements.
+
+## Biling Arcade
+
+Read [Arcade development](ARCADE_DEVELOPMENT.md) before changing puzzle content or attempt logic. Keep puzzle solutions and accepted aliases on the server. Verify two-session continuity against local PostgreSQL and distinguish browser or device execution from bundle exports.

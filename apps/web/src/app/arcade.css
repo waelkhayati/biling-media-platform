@@ -1,0 +1,165 @@
+.arcade-feature {
+  margin-block: 2rem;
+}
+.arcade-feature h2 {
+  font: 900 clamp(2rem, 6vw, 4rem)/1 var(--font-display);
+  text-transform: uppercase;
+}
+.arcade-lineup {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 1rem;
+}
+.arcade-tile {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.25rem;
+  min-height: 220px;
+  background: var(--black);
+  color: var(--paper);
+  border: 3px solid var(--black);
+}
+.arcade-tile[data-kind="MOT"] {
+  background: var(--lime);
+  color: var(--black);
+}
+.arcade-tile[data-kind="RECALL"] {
+  background: var(--orange);
+  color: var(--black);
+}
+.arcade-tile:hover strong {
+  text-decoration: underline;
+}
+.arcade-tile strong {
+  font: 900 2rem/1 var(--font-display);
+  text-transform: uppercase;
+}
+.arcade-tile p {
+  margin: 0;
+}
+.arcade-glyph {
+  font: 900 2.25rem/1 monospace;
+  letter-spacing: 0.12em;
+}
+.arcade-board {
+  max-width: 900px;
+}
+.arcade-play {
+  display: grid;
+  gap: 1rem;
+}
+.arcade-play input {
+  display: block;
+  padding: 0.6rem;
+  border: 2px solid var(--black);
+  min-height: 46px;
+  font: inherit;
+  color: var(--black);
+  background: var(--paper);
+}
+.arcade-play .arcade-actions {
+  align-items: flex-end;
+}
+.mot-board {
+  display: grid;
+  gap: 0.35rem;
+}
+.mot-row {
+  display: flex;
+  gap: 0.35rem;
+}
+.mot-row span {
+  width: clamp(28px, 10vw, 58px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  position: relative;
+  border: 1px solid var(--black);
+  font-weight: 900;
+  font-size: 1.5rem;
+}
+.mot-row small {
+  position: absolute;
+  bottom: 1px;
+  inset-inline-end: 3px;
+  font-size: 0.7em;
+}
+.mot-row [data-mark="exact"] {
+  background: var(--lime);
+}
+.mot-row [data-mark="present"] {
+  background: var(--orange);
+}
+.mot-row [data-mark="absent"] {
+  background: #242424;
+  color: var(--paper);
+}
+.mot-keyboard {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  max-width: 620px;
+}
+.mot-keyboard button,
+.links-board button {
+  min-height: 44px;
+  min-width: 44px;
+  background: var(--paper);
+  color: var(--black);
+  border: 1px solid currentColor;
+  font-weight: 800;
+  cursor: pointer;
+}
+.mot-keyboard button[data-used="true"] {
+  border-bottom: 5px solid var(--orange);
+}
+.links-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.links-board button {
+  overflow-wrap: anywhere;
+  min-height: 65px;
+  min-width: 0;
+}
+.links-board button[aria-pressed="true"] {
+  background: var(--lime);
+  outline: 2px solid var(--black);
+}
+.links-group {
+  display: grid;
+  gap: 0.3rem;
+  background: var(--black);
+  color: var(--paper);
+  padding: 1rem;
+}
+.links-group[data-solved="true"] {
+  border-inline-start: 6px solid var(--lime);
+}
+.recall-clock {
+  font: 900 clamp(3rem, 12vw, 6rem)/1 monospace;
+}
+.recall-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+  gap: 0.4rem;
+  padding-inline-start: 1.5rem;
+}
+.recall-board li {
+  border-bottom: 1px solid;
+  padding: 0.7rem 0.4rem;
+}
+.recall-board li[data-found="true"] {
+  background: var(--lime);
+}
+.arcade-play button:focus-visible,
+.arcade-tile:focus-visible {
+  outline: 3px solid #094ab7;
+  outline-offset: 3px;
+}
+@media (max-width: 440px) {
+  .links-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

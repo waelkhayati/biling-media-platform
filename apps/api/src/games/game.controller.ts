@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Header, Inject, Param, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Header, Inject, Param, Patch, Post, Put, Query, Req, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { contentSlugSchema, gameAttemptInputSchema, gameInputSchema, gameQuerySchema, gameRequestDocs, gameUpdateSchema, staffContentIdSchema, studioGameQuerySchema } from "@biling/schemas";
 import type { ApiBodyOptions } from "@nestjs/swagger";
@@ -6,6 +6,7 @@ import type { Request } from "express";
 import { StaffGuard, type StaffRequest } from "../admin/staff.guard";
 import { AudienceService } from "../audience/audience.service";
 import { validate } from "../common/validate";
+import { dailyQuizMoveSchema } from "@biling/schemas";
 import { GameService } from "./game.service";
 
 function bearer(request: Request, required = false) {
@@ -36,6 +37,20 @@ export class GameController {
   @Get(":slug")
   @ApiOperation({ summary: "Read a playable published game without answers or scoring rules" })
   detail(@Param("slug") slug: string) { return this.games.detail(validate(contentSlugSchema, slug)); }
+  @Get(":slug/progress")
+  @Header("Cache-Control", "no-store")
+  async progress(@Param("slug") slug: string, @Req() request: Request) {
+    const viewer = await this.audience.authenticate(bearer(request, true)!);
+    return this.games.dailyProgress(validate(contentSlugSchema, slug), viewer.id);
+  }
+
+  @Put(":slug/progress")
+  @Header("Cache-Control", "no-store")
+  async saveProgress(@Param("slug") slug: string, @Body() body: unknown, @Req() request: Request) {
+    const viewer = await this.audience.authenticate(bearer(request, true)!);
+    await this.audience.limitCommunity(viewer.id, ip(request), "daily-progress", 120);
+    return this.games.dailyProgress(validate(contentSlugSchema, slug), viewer.id, validate(dailyQuizMoveSchema, body));
+  }
   @Post(":slug/attempts")
   @Header("Cache-Control", "no-store")
   @ApiResponse({ status: 409, description: "Official daily attempt already exists for this UTC day." })

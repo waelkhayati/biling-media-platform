@@ -12,10 +12,12 @@ const avatarUrl = z
   .url({ protocol: /^https$/, hostname: z.regexes.domain })
   .max(2048)
   .refine((value) => {
-    const url = URL.parse(value);
-    return (
-      !!url && !url.username && !url.password && !url.port && !url.hostname.endsWith(".localhost")
-    );
+    try {
+      const url = new URL(value);
+      return !url.username && !url.password && !url.port && !url.hostname.endsWith(".localhost");
+    } catch {
+      return false;
+    }
   }, "Enter an HTTPS image URL on a public domain.");
 
 export const audienceTokenSchema = z.string().regex(/^[A-Za-z0-9_-]{43}$/);

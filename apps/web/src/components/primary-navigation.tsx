@@ -4,11 +4,10 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { ContentLink } from "./content-link";
 
 type PrimaryNavigationProps = {
-  home: string;
   actions?: ReactNode;
 };
 
-export function PrimaryNavigation({ home, actions }: PrimaryNavigationProps) {
+export function PrimaryNavigation({ actions }: PrimaryNavigationProps) {
   const [open, setOpen] = useState(false);
   const drawerId = useId();
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -47,10 +46,10 @@ export function PrimaryNavigation({ home, actions }: PrimaryNavigationProps) {
       <ContentLink href="/games" onClick={inDrawer ? () => setOpen(false) : undefined}>
         Games
       </ContentLink>
-      <a href={`${home}#episodes`} onClick={inDrawer ? () => setOpen(false) : undefined}>
+      <a href="/#episodes" onClick={inDrawer ? () => setOpen(false) : undefined}>
         Episodes
       </a>
-      <a href={`${home}#people`} onClick={inDrawer ? () => setOpen(false) : undefined}>
+      <a href="/#people" onClick={inDrawer ? () => setOpen(false) : undefined}>
         People
       </a>
     </>

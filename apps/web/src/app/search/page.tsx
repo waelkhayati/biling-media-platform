@@ -131,7 +131,7 @@ export default async function SearchPage({
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <SiteHeader onDiscovery={false} />
+      <SiteHeader />
       <main id="main" className="detail-main">
         <section className="catalog-masthead page-gutter" aria-labelledby="search-title">
           <h1 className="detail-title" id="search-title">

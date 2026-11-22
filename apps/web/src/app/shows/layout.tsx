@@ -7,7 +7,7 @@ export default function ShowsLayout({ children }: { children: ReactNode }) {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <SiteHeader onDiscovery={false} />
+      <SiteHeader />
       <main id="main" className="detail-main">
         {children}
       </main>
