@@ -136,6 +136,7 @@ export default async function HomePage() {
                 title={`Explore ${featuredShow.title}`}
                 href={showPath(featuredShow.slug)}
                 className="hero-media"
+                eager
               />
             ) : (
               <MediaPlaceholder

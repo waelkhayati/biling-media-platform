@@ -57,7 +57,12 @@ export default function Explore() {
       <Status error={error} />
       {query ? (
         <>
-          <Status loading={search.loading} error={search.error} retry={search.refresh} />
+          <Status
+            skeleton="rows"
+            loading={search.loading && search.data === undefined}
+            error={search.error}
+            retry={search.refresh}
+          />
           {result && (
             <>
               {!result.shows.length && !result.episodes.length && !result.articles.length && (
@@ -103,7 +108,12 @@ export default function Explore() {
           </View>
           {section === "Productions" && (
             <>
-              <Status loading={shows.loading} error={shows.error} retry={shows.refresh} />
+              <Status
+                skeleton="card"
+                loading={shows.loading && shows.data === undefined}
+                error={shows.error}
+                retry={shows.refresh}
+              />
               {shows.data?.map((item) => (
                 <ShowCard key={item.id} item={item} />
               ))}

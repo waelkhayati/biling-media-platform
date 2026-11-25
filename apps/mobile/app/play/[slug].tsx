@@ -255,7 +255,12 @@ export default function Game() {
   if (view.data) return <Player key={view.data.id} game={view.data} />;
   return (
     <Screen>
-      <Status loading={view.loading} error={view.error} retry={view.refresh} />
+      <Status
+        skeleton="rows"
+        loading={view.loading && view.data === undefined}
+        error={view.error}
+        retry={view.refresh}
+      />
     </Screen>
   );
 }

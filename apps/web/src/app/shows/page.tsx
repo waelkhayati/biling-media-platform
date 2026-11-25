@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { CardSkeletons } from "@/components/content-skeleton";
 import type { PublishedShowFilters } from "@biling/contracts";
 import { contentQueryMaxLength, publishedShowFiltersSchema } from "@biling/schemas";
 import { ContentLink } from "@/components/content-link";
@@ -104,11 +105,7 @@ export default async function ShowsDirectory({
         {filters.success ? (
           <Suspense
             key={directoryPath(query, featured)}
-            fallback={
-              <p className="catalog-state" role="status">
-                Loading productions…
-              </p>
-            }
+            fallback={<CardSkeletons label={"Loading productions"} />}
           >
             <DirectoryResults filters={filters.data} />
           </Suspense>

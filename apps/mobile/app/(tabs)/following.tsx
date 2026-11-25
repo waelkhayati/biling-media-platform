@@ -24,10 +24,15 @@ export default function Following() {
     }, [token, feed.refresh]),
   );
   return (
-    <Screen tab refresh={token ? feed.refresh : undefined} refreshing={feed.loading}>
+    <Screen
+      tab
+      refresh={token ? feed.refresh : undefined}
+      refreshing={feed.loading && feed.data !== undefined}
+    >
       <Title>Following</Title>
       <Status
-        loading={!ready || (Boolean(token) && feed.loading)}
+        skeleton="card"
+        loading={!ready || (Boolean(token) && feed.loading && feed.data === undefined)}
         error={feed.error}
         retry={feed.refresh}
       />

@@ -21,8 +21,13 @@ export default function Episode() {
   const view = useResource(show + "/" + slug, () => api.episode(show, slug));
   const item = view.data;
   return (
-    <Screen refresh={view.refresh} refreshing={view.loading}>
-      <Status loading={view.loading} error={view.error} retry={view.refresh} />
+    <Screen refresh={view.refresh} refreshing={view.loading && view.data !== undefined}>
+      <Status
+        skeleton="detail"
+        loading={view.loading && view.data === undefined}
+        error={view.error}
+        retry={view.refresh}
+      />
       {item && (
         <>
           <Label>

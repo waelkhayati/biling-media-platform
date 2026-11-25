@@ -11,6 +11,7 @@ import "./games.css";
 import "./arcade.css";
 import "./typography.css";
 import "./legal.css";
+import "./loading.css";
 import { CookieConsent } from "@/components/cookie-consent";
 
 export const metadata: Metadata = {

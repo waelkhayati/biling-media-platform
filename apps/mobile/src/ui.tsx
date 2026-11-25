@@ -152,10 +152,12 @@ export function Status({
   loading,
   error,
   retry,
+  skeleton,
 }: {
   loading?: boolean;
   error?: string;
   retry?: () => void;
+  skeleton?: "card" | "hero" | "rail" | "detail" | "rows";
 }) {
   if (error)
     return (
@@ -165,10 +167,42 @@ export function Status({
       </View>
     );
   if (loading)
-    return (
+    return skeleton ? (
+      <ContentSkeleton layout={skeleton} />
+    ) : (
       <ActivityIndicator accessibilityLabel="Loading" color={color.lime} style={styles.spinner} />
     );
   return null;
+}
+function ContentSkeleton({ layout }: { layout: "card" | "hero" | "rail" | "detail" | "rows" }) {
+  const rail = layout === "rail";
+  const detail = layout === "detail";
+  return (
+    <View accessible accessibilityLabel="Loading content" accessibilityState={{ busy: true }}>
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={rail ? styles.skeletonRail : styles.stack}
+      >
+        {(rail || layout === "rows" ? [0, 1] : [0]).map((item) => (
+          <View key={item} style={[styles.card, rail && { width: 228 }]}>
+            {layout !== "rows" && (
+              <View
+                style={[
+                  styles.skeletonBlock,
+                  { aspectRatio: layout === "hero" ? 1.35 : detail ? 16 / 9 : 1.85 },
+                ]}
+              />
+            )}
+            <View style={styles.cardCopy}>
+              <View style={[styles.skeletonBlock, styles.skeletonTitle]} />
+              <View style={[styles.skeletonBlock, styles.skeletonCaption]} />
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
 }
 export function Artwork({
   uri,
@@ -279,6 +313,10 @@ export const styles = StyleSheet.create({
   },
   panel: { gap: 8, padding: 14, backgroundColor: color.ink, borderRadius: 7 },
   spinner: { padding: 24 },
+  skeletonRail: { flexDirection: "row", gap: 12, overflow: "hidden" },
+  skeletonBlock: { backgroundColor: color.line, borderRadius: 4 },
+  skeletonTitle: { width: "72%", height: 17 },
+  skeletonCaption: { width: "42%", height: 11 },
   art: { overflow: "hidden", backgroundColor: "#251711", justifyContent: "flex-end" },
   artAccent: { backgroundColor: color.orange, height: 8, width: "37%" },
   card: { backgroundColor: color.ink, borderRadius: 7, overflow: "hidden" },

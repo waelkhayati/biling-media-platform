@@ -33,7 +33,12 @@ export default function ArcadeRoute() {
     <Player key={slug + date + (token ?? "")} initial={resource.data} token={token} />
   ) : (
     <Screen>
-      <Status loading={resource.loading} error={resource.error} retry={resource.refresh} />
+      <Status
+        skeleton="rows"
+        loading={resource.loading && resource.data === undefined}
+        error={resource.error}
+        retry={resource.refresh}
+      />
     </Screen>
   );
 }

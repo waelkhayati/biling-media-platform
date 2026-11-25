@@ -37,7 +37,12 @@ export function Catalog<T extends { id: string }>({
   ];
   return (
     <>
-      <Status loading={first.loading} error={first.error} retry={first.refresh} />
+      <Status
+        skeleton="rows"
+        loading={first.loading && first.data === undefined}
+        error={first.error}
+        retry={first.refresh}
+      />
       {first.data && !items.length && <Copy muted>{empty}</Copy>}
       {items.map(render)}
       <Status error={error} />

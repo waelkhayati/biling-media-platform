@@ -11,8 +11,13 @@ export default function Show() {
   const view = useResource(slug, () => api.show(slug));
   const item = view.data;
   return (
-    <Screen refresh={view.refresh} refreshing={view.loading}>
-      <Status loading={view.loading} error={view.error} retry={view.refresh} />
+    <Screen refresh={view.refresh} refreshing={view.loading && view.data !== undefined}>
+      <Status
+        skeleton="detail"
+        loading={view.loading && view.data === undefined}
+        error={view.error}
+        retry={view.refresh}
+      />
       {item && (
         <>
           <Artwork uri={item.posterUrl ?? still(item.episodes[0]?.youtubeVideoId)} />

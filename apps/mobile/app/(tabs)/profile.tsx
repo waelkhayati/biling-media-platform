@@ -214,7 +214,11 @@ function Member() {
     }
   }
   return (
-    <Screen tab refresh={history.refresh} refreshing={history.loading}>
+    <Screen
+      tab
+      refresh={history.refresh}
+      refreshing={history.loading && history.data !== undefined}
+    >
       <Label>Profile</Label>
       <Title>{profile.displayName}</Title>
       <Copy muted>@{profile.username}</Copy>
@@ -278,7 +282,12 @@ function Member() {
         <Action quiet label="Edit profile" disabled={busy} onPress={beginEdit} />
       )}
       <Heading>Game history</Heading>
-      <Status loading={history.loading} error={history.error} retry={history.refresh} />
+      <Status
+        skeleton="rows"
+        loading={history.loading && history.data === undefined}
+        error={history.error}
+        retry={history.refresh}
+      />
       {history.data?.length === 0 && <Copy muted>Your saved attempts will appear here.</Copy>}
       {history.data?.map((entry) => (
         <Card

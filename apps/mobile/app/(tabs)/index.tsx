@@ -50,9 +50,9 @@ export default function Home() {
     <Screen
       tab
       refresh={refresh}
-      refreshing={
-        shows.loading || episodes.loading || articles.loading || games.loading || following.loading
-      }
+      refreshing={[shows, episodes, articles, games, following].some(
+        (resource) => resource.loading && resource.data !== undefined,
+      )}
     >
       <View style={homeStyles.brand}>
         <View style={homeStyles.logoTile}>
@@ -78,11 +78,21 @@ export default function Home() {
           <Copy muted>Check here for the next Biling broadcast.</Copy>
         )}
       </View>
-      <Status loading={shows.loading} error={shows.error} retry={shows.refresh} />
+      <Status
+        skeleton="hero"
+        loading={shows.loading && shows.data === undefined}
+        error={shows.error}
+        retry={shows.refresh}
+      />
       {featured && <ShowCard item={featured} hero />}
       {shows.data?.length === 0 && <Copy muted>Published productions will appear here.</Copy>}
       <Heading>Latest episodes</Heading>
-      <Status loading={episodes.loading} error={episodes.error} retry={episodes.refresh} />
+      <Status
+        skeleton="rail"
+        loading={episodes.loading && episodes.data === undefined}
+        error={episodes.error}
+        retry={episodes.refresh}
+      />
       {episodes.data?.length ? (
         <Rail>
           {episodes.data.slice(0, 8).map((item) => (
@@ -95,13 +105,23 @@ export default function Home() {
         episodes.data && <Copy muted>No episodes yet.</Copy>
       )}
       <Heading>Stories</Heading>
-      <Status loading={articles.loading} error={articles.error} retry={articles.refresh} />
+      <Status
+        skeleton="card"
+        loading={articles.loading && articles.data === undefined}
+        error={articles.error}
+        retry={articles.refresh}
+      />
       {articles.data?.items.slice(0, 3).map((item) => (
         <ArticleCard key={item.id} item={item} />
       ))}
       {articles.data?.items.length === 0 && <Copy muted>No stories yet.</Copy>}
       <Heading>Biling Games</Heading>
-      <Status loading={games.loading} error={games.error} retry={games.refresh} />
+      <Status
+        skeleton="rows"
+        loading={games.loading && games.data === undefined}
+        error={games.error}
+        retry={games.refresh}
+      />
       {challenge && <GameCard item={challenge} />}
       <Action quiet label="Browse games" onPress={() => router.push("/games")} />
       {!!following.data?.length && (

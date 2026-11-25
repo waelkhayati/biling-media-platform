@@ -118,7 +118,7 @@ export default async function ShowPage({ params, searchParams }: ShowPageProps) 
             </div>
             <div>
               {trailerId ? (
-                <YouTubePlayer videoId={trailerId} title={`${show.title} trailer`} />
+                <YouTubePlayer videoId={trailerId} title={`${show.title} trailer`} lazy />
               ) : featuredEpisode ? (
                 <ContentLink
                   className="button button-light"

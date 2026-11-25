@@ -25,11 +25,16 @@ export default function Games() {
         setRevision((value) => value + 1);
         void arcade.refresh();
       }}
-      refreshing={arcade.loading}
+      refreshing={arcade.loading && arcade.data !== undefined}
     >
       <Title>Biling Arcade</Title>
       <Heading>Today's puzzles</Heading>
-      <Status loading={arcade.loading} error={arcade.error} retry={arcade.refresh} />
+      <Status
+        skeleton="rows"
+        loading={arcade.loading && arcade.data === undefined}
+        error={arcade.error}
+        retry={arcade.refresh}
+      />
       {arcade.data?.length === 0 && <Copy muted>No daily puzzles are scheduled today.</Copy>}
       {arcade.data?.map((game) => (
         <Pressable

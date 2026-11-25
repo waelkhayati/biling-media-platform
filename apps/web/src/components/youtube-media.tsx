@@ -7,11 +7,13 @@ export function YouTubeMedia({
   title,
   href,
   className = "",
+  eager = false,
 }: {
   videoId: string;
   title: string;
   href: string;
   className?: string;
+  eager?: boolean;
 }) {
   return (
     <ContentLink className={`youtube-media ${className}`.trim()} href={href} aria-label={title}>
@@ -21,6 +23,7 @@ export function YouTubeMedia({
         fill
         sizes="(max-width: 600px) 90vw, (max-width: 1000px) 60vw, 45vw"
         unoptimized
+        loading={eager ? "eager" : "lazy"}
       />
       <span className="youtube-play" aria-hidden="true">
         ▶

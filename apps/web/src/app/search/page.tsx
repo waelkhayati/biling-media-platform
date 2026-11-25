@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { CardSkeletons } from "@/components/content-skeleton";
 import { contentQueryMaxLength, contentQuerySchema } from "@biling/schemas";
 import { ArticleCards } from "@/components/editorial-articles";
 import { ContentLink } from "@/components/content-link";
@@ -153,11 +154,7 @@ export default async function SearchPage({
           )}
           <Suspense
             key={query.data ?? ""}
-            fallback={
-              <p className="catalog-state" role="status">
-                {query.success ? "Searching…" : "Loading suggestions…"}
-              </p>
-            }
+            fallback={<CardSkeletons label={query.success ? "Searching" : "Loading suggestions"} />}
           >
             {query.success ? <SearchResults query={query.data} /> : <SearchSuggestions />}
           </Suspense>

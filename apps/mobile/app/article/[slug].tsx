@@ -127,8 +127,13 @@ export default function Article() {
     }
   }
   return (
-    <Screen refresh={view.refresh} refreshing={view.loading}>
-      <Status loading={view.loading} error={view.error} retry={view.refresh} />
+    <Screen refresh={view.refresh} refreshing={view.loading && view.data !== undefined}>
+      <Status
+        skeleton="detail"
+        loading={view.loading && view.data === undefined}
+        error={view.error}
+        retry={view.refresh}
+      />
       {item && (
         <>
           <Label>{item.category}</Label>
